@@ -1,2 +1,4 @@
-# rust-api
-Rust API.
+# Throwaway
+A **mock** payments processing system.
+
+(An excuse to play around with certain technologies)

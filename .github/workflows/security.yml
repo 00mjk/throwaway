@@ -1,0 +1,36 @@
+name: Security
+
+on:
+  push:
+    branches:
+      - master
+
+  schedule:
+    # At 12:00 on Wednesday
+    - cron: '0 12 * * 3'
+
+jobs:
+  audit:
+    name: Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Run Audit
+        uses: actions-rs/audit-check@v1
+        with:
+          token: "${{ secrets.GITHUB_TOKEN }}"
+
+  deny:
+    name: Deny
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Run Deny
+        uses: EmbarkStudios/cargo-deny-action@v1
+        with:
+          command: check
+          arguments: --all-features

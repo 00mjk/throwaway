@@ -1,0 +1,13 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: throwaway-ingress
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`throwaway.127.0.0.1.nip.io`)
+      kind: Rule
+      services:
+        - name: throwaway
+          port: 8000

@@ -1,0 +1,28 @@
+apiVersion: skaffold/v2beta26
+kind: Config
+
+metadata:
+  name: throwaway
+
+build:
+  artifacts:
+    - image: throwaway
+      context: .
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "src/**/*"
+            dest: "/app"
+
+          - src: "sql/migrations/**/*"
+            dest: "/app/migrations"
+
+deploy:
+  helm:
+    releases:
+      - name: throwaway
+        chartPath: charts/throwaway
+        wait: true
+        artifactOverrides:
+          image: throwaway

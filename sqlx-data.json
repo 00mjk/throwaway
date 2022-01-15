@@ -1,0 +1,221 @@
+{
+  "db": "PostgreSQL",
+  "031156dcd55b3f88cb262e6de05bc0d7fe7ebff085c3b90a39acbeb85b60a2ab": {
+    "query": "\n            UPDATE throwaway.profile\n            SET\n                name = $1,\n                email = $2,\n                password = $3,\n                country = $4,\n                timezone = $5\n            WHERE profile_id = $6\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text",
+          "Text",
+          "Text",
+          "Text",
+          "Uuid"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "1024a2e864efa0ee1f06932b6c26ea120dabea713073c8c548e1dbc5f03befdc": {
+    "query": "\n            SELECT profile_id, name, email, password, country, timezone, created_at, updated_at, is_deleted\n            FROM throwaway.profile\n            WHERE profile_id = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "profile_id",
+          "type_info": "Uuid"
+        },
+        {
+          "ordinal": 1,
+          "name": "name",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 2,
+          "name": "email",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 3,
+          "name": "password",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 4,
+          "name": "country",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 5,
+          "name": "timezone",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 6,
+          "name": "created_at",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 7,
+          "name": "updated_at",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 8,
+          "name": "is_deleted",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "58cb2cf00d80a32f394e7349783faea3101b04482a1e6771bb35d187893dd947": {
+    "query": "\n            SELECT profile_id, name, email, password, country, timezone, created_at, updated_at, is_deleted\n            FROM throwaway.profile\n            WHERE email = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "profile_id",
+          "type_info": "Uuid"
+        },
+        {
+          "ordinal": 1,
+          "name": "name",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 2,
+          "name": "email",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 3,
+          "name": "password",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 4,
+          "name": "country",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 5,
+          "name": "timezone",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 6,
+          "name": "created_at",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 7,
+          "name": "updated_at",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 8,
+          "name": "is_deleted",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "63e08c75b35837df102cf1dc9711a0c83b55178db2325d1af9d87fa057c2cff3": {
+    "query": "\n            INSERT INTO throwaway.profile (name, email, password, country, timezone)\n            VALUES ($1, $2, $3, $4, $5)\n            RETURNING (profile_id)\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "profile_id",
+          "type_info": "Uuid"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text",
+          "Text",
+          "Text",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "7e58fc725f2a55bc59cbd19a81ffd30295ffcba38135d79214f7fda5d645cae9": {
+    "query": "\n            SELECT EXISTS(\n              SELECT 1\n              FROM information_schema.tables\n              WHERE table_schema = $1 AND table_name = $2\n            )\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "exists",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text"
+        ]
+      },
+      "nullable": [
+        null
+      ]
+    }
+  },
+  "aac04e444601555d3543ba016ade0fa6b69b200aad65a0a184f0f8fce1b68d7b": {
+    "query": "\n            SELECT EXISTS(\n                SELECT 1\n                FROM throwaway.profile\n                WHERE email = $1\n            )\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "exists",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": [
+        null
+      ]
+    }
+  }
+}

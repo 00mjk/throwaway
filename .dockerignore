@@ -1,0 +1,12 @@
+# Ignore Everything
+**
+
+# Project
+!.cargo
+!docker
+!src
+!sql
+!Cargo.lock
+!Cargo.toml
+!README.md
+!sqlx-data.json

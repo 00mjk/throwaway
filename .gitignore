@@ -1,0 +1,11 @@
+# MacOS
+.DS_Store
+
+# IntelliJ
+.idea
+*.iml
+*.ipr
+
+# Rust
+target
+*.rs.bk

@@ -1,0 +1,77 @@
+# https://doc.rust-lang.org/cargo/reference/manifest.html
+[package]
+name = "throwaway"
+description = "?"
+version = "0.1.0"
+authors = ["Cathal Mullan <contact@cathal.dev>"]
+edition = "2021"
+keywords = ["api"]
+categories = ["web-programming", "asynchronous"]
+repository = "https://github.com/CathalMullan/throwaway"
+license = "MIT"
+
+[badges]
+maintenance = { status = "experimental" }
+
+[dependencies]
+# Async
+tokio = { version = "1.15", features = ["full", "tracing"] }
+futures = "0.3"
+
+# Authentication
+jsonwebtoken = "7.2"
+
+# API
+axum = { version = "0.4", features = ["headers"] }
+axum-extra = "0.1"
+http-body = "0.4"
+headers = "0.3"
+
+# Cache
+redis = { version = "0.21", features = ["tokio-comp", "tokio-native-tls-comp"] }
+deadpool-redis = { version = "0.10", features = ["serde"] }
+
+# Config
+envconfig = "0.10"
+dotenv = "0.15"
+
+# Database
+sqlx = { version = "0.5", features = ["runtime-tokio-rustls", "postgres", "tls", "json", "uuid", "chrono", "offline"] }
+
+# Datetime
+chrono = { version = "0.4", features = ["serde"] }
+
+# Errors
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Hashing
+argon2 = "0.3"
+rand_core = { version = "0.6", features = ["std"] }
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["registry", "env-filter"] }
+tracing-futures = { version = "0.2", features = ["tokio"] }
+tracing-log = "0.1"
+tracing-error = "0.2"
+
+# TLS
+rustls = "0.20"
+
+# Secrets
+vaultrs = "0.5"
+
+# Serialization
+serde = "1.0"
+serde_json = "1.0"
+
+# UUID
+uuid = { version = "0.8", features = ["v4", "serde"] }
+
+# Validation
+validator = { version = "0.14", features = ["derive"] }
+
+[[bin]]
+name = "throwaway"
+path = "src/main.rs"

@@ -1,0 +1,25 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: throwaway
+spec:
+  selector:
+    matchLabels:
+      app: throwaway
+  template:
+    metadata:
+      labels:
+        app: throwaway
+    spec:
+      containers:
+        - name: throwaway
+          image: {{ .Values.image }}
+          ports:
+            - containerPort: 8000
+          env:
+            {{- range $key, $value := $.Values.env }}
+            - name: {{ $key | quote }}
+              value: {{ $value | quote }}
+            {{- end }}
+
