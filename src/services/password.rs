@@ -1,8 +1,9 @@
+use anyhow::Result;
 use argon2::password_hash::SaltString;
 use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
 use rand_core::OsRng;
 
-use crate::core::errors::ServerError;
+use crate::errors::internal::ServerError;
 
 #[derive(Clone)]
 pub struct PasswordService {

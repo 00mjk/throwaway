@@ -1,6 +1,8 @@
+use anyhow::Result;
 use futures::future::try_join_all;
+use tracing::error;
 
-use crate::core::errors::ServerError;
+use crate::errors::internal::ServerError;
 use crate::models::response::healthcheck::{HealthDatabaseResponse, HealthcheckResponse};
 use crate::repositories::healthcheck::HealthcheckRepository;
 
@@ -18,8 +20,8 @@ impl HealthcheckService {
 
     // NOTE: Should a service return a response model?
     // NOTE: Probably not.
-    // NOTE: Where do we handle the mapping then?
-    pub async fn perform_healthcheck(&self) -> HealthcheckResponse {
+    // NOTE: Where do we handle the mapping then? Answer: The handler.
+    pub async fn perform_healthcheck(&self) -> Result<HealthcheckResponse, ServerError> {
         let pg_database_exists = self
             .healthcheck_repository
             .table_exists("pg_catalog", "pg_database");
@@ -32,16 +34,18 @@ impl HealthcheckService {
             .healthcheck_repository
             .table_exists("pg_catalog", "pg_statistic");
 
-        let results = try_join_all([pg_database_exists, pg_index_exists, pg_statistic_exists])
-            .await
-            .map_err(|err| ServerError::NotFound(err.to_string()))
-            .unwrap();
+        let results = try_join_all([pg_database_exists, pg_index_exists, pg_statistic_exists]).await;
+        if let Err(error) = results {
+            error!("Healthcheck error: {error:#?}");
+            return Err(ServerError::GenericError);
+        }
 
-        HealthcheckResponse {
+        // FIXME: Don't build response here...
+        Ok(HealthcheckResponse {
             ok: true,
             database: HealthDatabaseResponse {
-                tables: results.into_iter().collect(),
+                tables: results.unwrap().into_iter().collect(),
             },
-        }
+        })
     }
 }

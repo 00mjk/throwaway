@@ -3,6 +3,8 @@ use jsonwebtoken::errors::ErrorKind;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use uuid::Uuid;
 
+use crate::errors::internal::ServerError;
+use crate::errors::token::TokenError;
 use crate::models::claims::{Claims, ISS};
 use crate::models::secrets::jwt::JwtSecrets;
 
@@ -36,7 +38,7 @@ impl TokenService {
         token.unwrap()
     }
 
-    pub fn decode(&self, token: &str) -> Claims {
+    pub fn decode(&self, token: &str) -> Result<Claims, ServerError> {
         let validation = Validation {
             iss: Some(ISS.to_string()),
             ..Validation::default()
@@ -46,18 +48,13 @@ impl TokenService {
         let token_data = decode::<Claims>(token, &decoding_key, &validation);
 
         return match token_data {
-            Ok(token) => token.claims,
+            Ok(token) => Ok(token.claims),
             Err(err) => {
                 match err.kind() {
-                    ErrorKind::InvalidToken => {
-                        panic!("Token is invalid");
-                    }
-                    ErrorKind::InvalidIssuer => {
-                        panic!("Issuer is invalid");
-                    }
-                    _ => {
-                        panic!("Some other errors");
-                    }
+                    ErrorKind::InvalidToken => Err(TokenError::InvalidToken.into()),
+                    ErrorKind::InvalidIssuer => Err(TokenError::InvalidIssuer.into()),
+                    ErrorKind::ExpiredSignature => Err(TokenError::ExpiredToken.into()),
+                    _ => Err(TokenError::Generic.into()),
                 }
             }
         };

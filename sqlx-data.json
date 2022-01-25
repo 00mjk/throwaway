@@ -217,5 +217,31 @@
         null
       ]
     }
+  },
+  "b2501c180488b4c2fd1dde3f4a513fda64d25684354afd7347238f03940c9d92": {
+    "query": "\n            UPDATE throwaway.profile\n            SET name = $1\n            WHERE profile_id = $2\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Uuid"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "ee31f688357cd1ececb506d20910995345e776fc1a55e7bc5b501aef3967993b": {
+    "query": "\n            UPDATE throwaway.profile\n            SET email = $1\n            WHERE profile_id = $2\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Uuid"
+        ]
+      },
+      "nullable": []
+    }
   }
 }

@@ -1,10 +1,10 @@
 use std::time::Duration;
 
 use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
-use tracing::info;
+use tracing::{error, info};
 
 use crate::config::Config;
-use crate::core::errors::ServerError;
+use crate::errors::internal::ServerError;
 use crate::models::secrets::database::DatabaseSecrets;
 
 pub type DatabasePool = Pool<Postgres>;
@@ -16,12 +16,15 @@ pub async fn connect(config: &Config, database_secrets: &DatabaseSecrets) -> Res
         database_secrets.dsn()
     };
 
-    info!("Database DSN: {}", &dsn);
+    info!("Database DSN: {dsn}");
 
     PgPoolOptions::new()
         .max_connections(config.database_connections)
         .max_lifetime(Duration::from_secs(config.database_lifetime))
         .connect(&dsn)
         .await
-        .map_err(|err| ServerError::ConnectingToDatabase(err.to_string()))
+        .map_err(|error| {
+            error!("Failed to connect to Postgres: {error:#?}");
+            ServerError::GenericError
+        })
 }

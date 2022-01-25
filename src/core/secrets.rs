@@ -1,9 +1,9 @@
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use vaultrs::client::{VaultClient, VaultClientSettingsBuilder};
 use vaultrs::kv2;
 
 use crate::config::Config;
-use crate::core::errors::ServerError;
 use crate::models::secrets::cache::CacheSecrets;
 use crate::models::secrets::database::DatabaseSecrets;
 use crate::models::secrets::jwt::JwtSecrets;
@@ -15,7 +15,7 @@ pub struct Secrets {
     pub jwt: JwtSecrets,
 }
 
-pub async fn read(config: &Config) -> Result<Secrets, ServerError> {
+pub async fn read(config: &Config) -> Result<Secrets> {
     let settings = VaultClientSettingsBuilder::default()
         .address(&config.vault_url)
         .token(&config.vault_token)

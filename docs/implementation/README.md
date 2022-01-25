@@ -170,6 +170,9 @@ Showcase generated CLI capabilities.
 ## Terraform Module Interface
 Showcase generated Terraform Module capabilities.
 
+## Support federated authentication (OIDC / SAML)
+...
+
 ## Internal Endpoints
 ...
 

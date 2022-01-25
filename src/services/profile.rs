@@ -1,6 +1,8 @@
+use anyhow::Result;
 use sqlx::types::Uuid;
+use tracing::error;
 
-use crate::core::errors::ServerError;
+use crate::errors::internal::ServerError;
 use crate::models::database::profile::Profile;
 use crate::models::request::register::RegisterRequest;
 use crate::repositories::profile::ProfileRepository;
@@ -27,7 +29,8 @@ impl ProfileService {
             .await?;
 
         if profile_exists {
-            return Err(ServerError::Internal("user with email already exists".to_string()));
+            error!("Profile already exists");
+            return Err(ServerError::GenericError);
         }
 
         let password_hash = self
@@ -40,7 +43,7 @@ impl ProfileService {
         let profile_id = self
             .profile_repository
             .insert(register_request)
-            .await;
+            .await?;
 
         Ok(profile_id)
     }
@@ -60,6 +63,36 @@ impl ProfileService {
             .await?;
 
         Ok(())
+    }
+
+    pub async fn update_name(&self, profile_id: Uuid, name: String) -> Result<Profile, ServerError> {
+        let mut profile: Profile = self.read(profile_id).await?;
+        if name == profile.name {
+            error!("Name already set");
+            return Err(ServerError::GenericError);
+        }
+
+        profile.name = name.clone();
+        self.profile_repository
+            .update_name(profile_id, name)
+            .await?;
+
+        Ok(profile)
+    }
+
+    pub async fn update_email(&self, profile_id: Uuid, email: String) -> Result<Profile, ServerError> {
+        let mut profile: Profile = self.read(profile_id).await?;
+        if email == profile.email {
+            error!("Email already set");
+            return Err(ServerError::GenericError);
+        }
+
+        profile.name = email.clone();
+        self.profile_repository
+            .update_email(profile_id, email)
+            .await?;
+
+        Ok(profile)
     }
 
     // pub async fn delete(&self, profile_id: Uuid) -> Result<Profile, ServerError> {

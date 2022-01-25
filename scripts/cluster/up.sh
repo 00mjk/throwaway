@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
-set -euxo pipefail
+set -euo pipefail
 
 # Cluster
 if ! (k3d cluster list | grep -q throwaway); then
   k3d cluster create throwaway \
+    --api-port 127.0.0.1:6443 \
     --k3s-arg "--no-deploy=traefik@server:*" \
     --port "80:80@loadbalancer" \
     --port "433:433@loadbalancer" \
     --port "5432:5432@loadbalancer" \
     --port "6379:6379@loadbalancer" \
     --wait
+
+  k3d kubeconfig merge throwaway --kubeconfig-switch-context
 else
   kubectl cluster-info
 fi

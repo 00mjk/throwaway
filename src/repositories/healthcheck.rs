@@ -1,4 +1,5 @@
-use crate::core::errors::ServerError;
+use anyhow::Result;
+
 use crate::database::DatabasePool;
 use crate::Cache;
 
@@ -16,13 +17,14 @@ impl HealthcheckRepository {
         }
     }
 
-    pub async fn table_exists(&self, table_schema: &str, table_name: &str) -> Result<(String, bool), ServerError> {
-        let identifier = format!("{}.{}", table_schema, table_name);
-        let cache_key = format!("table_exists_{}", identifier);
+    pub async fn table_exists(&self, table_schema: &str, table_name: &str) -> Result<(String, bool)> {
+        let identifier = format!("{table_schema}.{table_name}");
+        let cache_key = format!("table_exists_{identifier}");
         if let Some(result) = self.cache.get(&cache_key).await {
             return Ok((identifier, result));
         }
 
+        // language=sql
         let query = sqlx::query!(
             r#"
             SELECT EXISTS(

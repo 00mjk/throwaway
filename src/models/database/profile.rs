@@ -5,6 +5,8 @@ use serde_json;
 use sqlx::FromRow;
 use uuid::Uuid;
 
+use crate::models::public::profile::ProfilePublic;
+
 #[derive(Clone, Debug, Serialize, Deserialize, FromRow)]
 pub struct Profile {
     pub profile_id: Uuid,
@@ -16,6 +18,18 @@ pub struct Profile {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub is_deleted: bool,
+}
+
+/// FIXME: Perhaps better ot support .into() style access? How do we do that, use From<T> ?
+impl Profile {
+    pub fn to_public(&self) -> ProfilePublic {
+        ProfilePublic {
+            name: self.name.clone(),
+            email: self.email.clone(),
+            country: self.country.clone(),
+            timezone: self.timezone.clone(),
+        }
+    }
 }
 
 impl ToRedisArgs for &Profile {

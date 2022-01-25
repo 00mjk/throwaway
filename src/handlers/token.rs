@@ -1,9 +1,11 @@
+use anyhow::Result;
 use axum::extract::Extension;
 use axum::http::StatusCode;
 use axum::routing::post;
 use axum::{Json, Router};
+use tracing::info;
 
-use crate::core::errors::ServerError;
+use crate::errors::internal::ServerError;
 use crate::models::request::token::TokenRequest;
 use crate::models::response::token::TokenResponse;
 use crate::{ProfileService, TokenService};
@@ -17,13 +19,15 @@ pub async fn token_post(
     Extension(profile_service): Extension<ProfileService>,
     Extension(token_service): Extension<TokenService>,
 ) -> Result<(StatusCode, Json<TokenResponse>), ServerError> {
+    info!("Token POST: {token_request:?}");
+
     // Verify email and password are valid.
     let (valid_credentials, profile) = profile_service
         .verify_credentials(token_request.email, token_request.password)
         .await?;
 
     if !valid_credentials {
-        return Err(ServerError::Internal("Invalid password".to_string()));
+        return Err(ServerError::GenericError);
     }
 
     // Generate token

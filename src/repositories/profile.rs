@@ -1,7 +1,11 @@
+use anyhow::Result;
 use sqlx::types::Uuid;
+use tracing::error;
+use tracing::instrument;
 
-use crate::core::errors::ServerError;
 use crate::database::DatabasePool;
+use crate::errors::internal::ServerError;
+use crate::errors::profile::ProfileError;
 use crate::models::database::profile::Profile;
 use crate::models::request::register::RegisterRequest;
 use crate::Cache;
@@ -12,6 +16,7 @@ pub struct ProfileRepository {
     pub cache: Cache,
 }
 
+/// FIXME: I wonder if splitting this into SQL v Cache repos (?) would be nicer?
 impl ProfileRepository {
     pub const fn new(database: DatabasePool, cache: Cache) -> Self {
         Self {
@@ -20,7 +25,10 @@ impl ProfileRepository {
         }
     }
 
-    pub async fn insert(&self, register_request: RegisterRequest) -> Uuid {
+    // FIXME: Probably shouldn't pass in request object directly, pass in parts instead.
+    #[instrument(skip(self), level = "info")]
+    pub async fn insert(&self, register_request: RegisterRequest) -> Result<Uuid, ServerError> {
+        // language=sql
         let query = sqlx::query!(
             r#"
             INSERT INTO throwaway.profile (name, email, password, country, timezone)
@@ -34,21 +42,23 @@ impl ProfileRepository {
             register_request.timezone,
         );
 
-        let profile_id: Uuid = query
-            .fetch_one(&self.database)
-            .await
-            .unwrap()
-            .profile_id;
-
-        profile_id
+        return match query.fetch_one(&self.database).await {
+            Ok(output) => Ok(output.profile_id),
+            Err(error) => {
+                // Tracing instead? Then we don't need to log out parameters every time
+                error!("Could not insert Profile: {error:#?}");
+                Err(ProfileError::NotFound.into())
+            }
+        };
     }
 
+    #[instrument(skip(self), level = "info")]
     pub async fn exists(&self, email: &str) -> Result<bool, ServerError> {
-        let cache_key = format!("profile_exists_{}", email);
-        if let Some(cache_result) = self.cache.get(&cache_key).await {
-            return Ok(cache_result);
+        if self.cache_exists_by_email(email).await {
+            return Ok(true);
         }
 
+        // language=sql
         let query = sqlx::query!(
             r#"
             SELECT EXISTS(
@@ -63,24 +73,22 @@ impl ProfileRepository {
         return match query.fetch_one(&self.database).await {
             Ok(output) => {
                 let exists: bool = output.exists.unwrap();
-                if exists {
-                    self.cache
-                        .set(&cache_key, exists, 600)
-                        .await;
-                }
-
                 Ok(exists)
             }
-            Err(_) => Err(ServerError::Internal("".to_string())),
+            Err(error) => {
+                error!("Could not find existing Profile by email: {error:#?}");
+                Err(ProfileError::NotFound.into())
+            }
         };
     }
 
+    #[instrument(skip(self), level = "info")]
     pub async fn get_by_email(&self, email: &str) -> Result<Profile, ServerError> {
-        let cache_key = format!("profile_email_{}", email);
-        if let Some(profile) = self.cache.get(&cache_key).await {
+        if let Some(profile) = self.cache_get_by_email(email).await {
             return Ok(profile);
         }
 
+        // language=sql
         let query = sqlx::query_as!(
             Profile,
             r#"
@@ -93,22 +101,23 @@ impl ProfileRepository {
 
         return match query.fetch_one(&self.database).await {
             Ok(profile) => {
-                self.cache
-                    .set(&cache_key, &profile, 600)
-                    .await;
-
+                self.cache_set(profile.clone()).await;
                 Ok(profile)
             }
-            Err(_) => Err(ServerError::Internal("".to_string())),
+            Err(error) => {
+                error!("Could not find Profile by email: {error:#?}");
+                Err(ProfileError::NotFound.into())
+            }
         };
     }
 
+    #[instrument(skip(self), level = "info")]
     pub async fn get_by_profile_id(&self, profile_id: Uuid) -> Result<Profile, ServerError> {
-        let cache_key = format!("profile_id_{}", profile_id);
-        if let Some(profile) = self.cache.get(&cache_key).await {
+        if let Some(profile) = self.cache_get_by_id(profile_id).await {
             return Ok(profile);
         }
 
+        // language=sql
         let query = sqlx::query_as!(
             Profile,
             r#"
@@ -121,19 +130,20 @@ impl ProfileRepository {
 
         return match query.fetch_one(&self.database).await {
             Ok(profile) => {
-                self.cache
-                    .set(&cache_key, &profile, 600)
-                    .await;
-
+                self.cache_set(profile.clone()).await;
                 Ok(profile)
             }
-            Err(_) => Err(ServerError::Internal("".to_string())),
+            Err(error) => {
+                error!("Could not find Profile by ID: {error:#?}");
+                Err(ProfileError::NotFound.into())
+            }
         };
     }
 
-    pub async fn update(&self, profile: Profile) -> Result<bool, ServerError> {
-        let query = sqlx::query_as!(
-            Profile,
+    #[instrument(skip(self), level = "info")]
+    pub async fn update(&self, profile: Profile) -> Result<(), ServerError> {
+        // language=sql
+        let query = sqlx::query!(
             r#"
             UPDATE throwaway.profile
             SET
@@ -152,9 +162,95 @@ impl ProfileRepository {
             profile.profile_id,
         );
 
-        return match query.fetch_one(&self.database).await {
-            Ok(_) => Ok(true),
-            Err(_) => Err(ServerError::Internal("".to_string())),
+        return match query.execute(&self.database).await {
+            Ok(_) => Ok(()),
+            Err(error) => {
+                // FIXME: Do we log out here or at the "error" mapping level?
+                error!("Failed to update Profile: {error:#?}");
+                Err(ProfileError::UpdateFailure.into())
+            }
         };
+    }
+
+    #[instrument(skip(self), level = "info")]
+    pub async fn update_name(&self, profile_id: Uuid, name: String) -> Result<(), ServerError> {
+        // language=sql
+        let query = sqlx::query!(
+            r#"
+            UPDATE throwaway.profile
+            SET name = $1
+            WHERE profile_id = $2
+            "#,
+            name,
+            profile_id,
+        );
+
+        return match query.execute(&self.database).await {
+            Ok(_) => Ok(()),
+            Err(error) => {
+                error!("Failed to update Profile name: {error:#?}");
+                Err(ProfileError::UpdateFailure.into())
+            }
+        };
+    }
+
+    #[instrument(skip(self), level = "info")]
+    pub async fn update_email(&self, profile_id: Uuid, email: String) -> Result<(), ServerError> {
+        // language=sql
+        let query = sqlx::query!(
+            r#"
+            UPDATE throwaway.profile
+            SET email = $1
+            WHERE profile_id = $2
+            "#,
+            email,
+            profile_id,
+        );
+
+        return match query.execute(&self.database).await {
+            Ok(_) => Ok(()),
+            Err(error) => {
+                error!("Failed to update Profile email: {error:#?}");
+                Err(ProfileError::UpdateFailure.into())
+            }
+        };
+    }
+
+    // NOTE: Seems like we shouldn't invalidate caches at all, simply update? Might no scale quite as well...
+    pub async fn cache_set(&self, profile: Profile) {
+        let cache_key_email = Self::cache_key_email(&profile.email);
+        self.cache
+            .set(&cache_key_email, &profile, 600)
+            .await;
+
+        let cache_key_id = Self::cache_key_id(profile.profile_id);
+        self.cache
+            .set(&cache_key_id, &profile, 600)
+            .await;
+    }
+
+    pub async fn cache_get_by_id(&self, profile_id: Uuid) -> Option<Profile> {
+        let cache_key = Self::cache_key_id(profile_id);
+        self.cache.get(&cache_key).await
+    }
+
+    // FIXME: Why do we need email again? For JWT lookups, why not just store Uuid in JWT and call it a day?
+    // FIXME: The "best practices" i followed seemed to stick with email as the claim in use for identification.
+    pub async fn cache_get_by_email(&self, email: &str) -> Option<Profile> {
+        let cache_key = Self::cache_key_email(email);
+        self.cache.get(&cache_key).await
+    }
+
+    pub async fn cache_exists_by_email(&self, email: &str) -> bool {
+        let cache_key = Self::cache_key_email(email);
+        self.cache.exists(&cache_key).await
+    }
+
+    pub fn cache_key_id(profile_id: Uuid) -> String {
+        format!("profile_id_{profile_id}")
+    }
+
+    pub fn cache_key_email(email: &str) -> String {
+        format!("profile_email_{email}")
     }
 }

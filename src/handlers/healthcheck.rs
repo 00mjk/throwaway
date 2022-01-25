@@ -1,8 +1,9 @@
 use axum::extract::Extension;
+use axum::http::StatusCode;
 use axum::routing::get;
 use axum::{Json, Router};
 
-use crate::core::errors::ServerError;
+use crate::errors::internal::ServerError;
 use crate::models::response::healthcheck::HealthcheckResponse;
 use crate::services::healthcheck::HealthcheckService;
 
@@ -12,10 +13,10 @@ pub fn routes() -> Router {
 
 pub async fn healthcheck(
     Extension(healthcheck_service): Extension<HealthcheckService>,
-) -> Result<Json<HealthcheckResponse>, ServerError> {
+) -> Result<(StatusCode, Json<HealthcheckResponse>), ServerError> {
     let healthcheck_response = healthcheck_service
         .perform_healthcheck()
-        .await;
+        .await?;
 
-    Ok(Json(healthcheck_response))
+    Ok((StatusCode::OK, Json(healthcheck_response)))
 }

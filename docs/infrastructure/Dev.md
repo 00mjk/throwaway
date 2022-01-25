@@ -37,3 +37,13 @@ Use the OIDC GitHub connector to apply/push changes.
 
 Example API: https://github.com/stefanprodan/podinfo
 Example API: http://vault.127.0.0.1.nip.io/v1/sys/health
+
+CSRF + CORS ?
+
+Cookies?
+
+Should JWT use a key instead? (via Vault PKI)
+
+Database transactions to prevent half-created hierarchies
+
+How to detect required token refresh?

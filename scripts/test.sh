@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-set -euxo pipefail
+set -euo pipefail
 
-cargo test --all --tests --all-targets --all-features
+cargo test --all --tests --all-targets --all-features -- --nocapture

@@ -13,6 +13,14 @@ license = "MIT"
 [badges]
 maintenance = { status = "experimental" }
 
+[lib]
+name = "throwaway"
+path = "src/lib.rs"
+
+[[bin]]
+name = "throwaway"
+path = "src/main.rs"
+
 [dependencies]
 # Async
 tokio = { version = "1.15", features = ["full", "tracing"] }
@@ -24,6 +32,7 @@ jsonwebtoken = "7.2"
 # API
 axum = { version = "0.4", features = ["headers"] }
 axum-extra = "0.1"
+hyper = "0.14"
 http-body = "0.4"
 headers = "0.3"
 
@@ -71,7 +80,3 @@ uuid = { version = "0.8", features = ["v4", "serde"] }
 
 # Validation
 validator = { version = "0.14", features = ["derive"] }
-
-[[bin]]
-name = "throwaway"
-path = "src/main.rs"

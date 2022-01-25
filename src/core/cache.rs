@@ -1,24 +1,25 @@
 use std::fmt::Debug;
 
+use anyhow::Result;
 use deadpool_redis::{Config as RedisConfig, Runtime};
 use deadpool_redis::{Connection, Pool};
 use redis::{AsyncCommands, FromRedisValue, ToRedisArgs};
-use tracing::info;
+use tracing::{error, info};
 
 use crate::config::Config;
-use crate::core::errors::ServerError;
+use crate::errors::internal::ServerError;
 use crate::models::secrets::cache::CacheSecrets;
 
 pub type CachePool = Pool;
 
-pub async fn connect(config: &Config, cache_secrets: &CacheSecrets) -> Result<CachePool, ServerError> {
+pub async fn connect(config: &Config, cache_secrets: &CacheSecrets) -> Result<CachePool> {
     let dsn = if config.use_local {
         cache_secrets.local_dsn()
     } else {
         cache_secrets.dsn()
     };
 
-    info!("Redis DSN: {}", &dsn);
+    info!("Redis DSN: {dsn}");
 
     let redis_config = RedisConfig {
         url: Some(dsn),
@@ -28,7 +29,10 @@ pub async fn connect(config: &Config, cache_secrets: &CacheSecrets) -> Result<Ca
 
     redis_config
         .create_pool(Some(Runtime::Tokio1))
-        .map_err(|err| ServerError::ConnectingToCache(err.to_string()))
+        .map_err(|error| {
+            error!("Failed to connect to Redis: {error:#?}");
+            ServerError::GenericError.into()
+        })
 }
 
 #[derive(Clone)]
@@ -53,13 +57,13 @@ impl Cache {
     {
         let mut cache = self.connection().await;
 
-        if cache.exists(&key).await.unwrap() {
+        if self.exists(key).await {
             let result = cache.get(&key).await.unwrap();
-            info!("HIT | {} | {:#?}", key, result);
+            info!("HIT | {key} | {result:#?}");
             return Some(result);
         }
 
-        info!("MISS | {}", key);
+        info!("MISS | {key}");
         None
     }
 
@@ -69,10 +73,29 @@ impl Cache {
     {
         let mut cache = self.connection().await;
 
-        info!("SET | {} | {:#?}", key, value);
+        info!("SET | {key} | {value:#?}");
         cache
             .set_ex::<_, _, ()>(&key, value, expiry)
             .await
             .unwrap();
+    }
+
+    pub async fn delete(&self, key: &str) {
+        let mut cache = self.connection().await;
+
+        info!("DELETE | {key}");
+        cache.del::<_, ()>(&key).await.unwrap();
+    }
+
+    pub async fn exists(&self, key: &str) -> bool {
+        let mut cache = self.connection().await;
+
+        if cache.exists(&key).await.unwrap() {
+            info!("EXISTS | {key} | true");
+            return true;
+        }
+
+        info!("EXISTS | {key} | false");
+        false
     }
 }

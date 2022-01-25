@@ -1,7 +1,9 @@
+use anyhow::Result;
 use dotenv::dotenv;
 use envconfig::Envconfig;
+use tracing::error;
 
-use crate::core::errors::ServerError;
+use crate::errors::internal::ServerError;
 
 #[derive(Envconfig, Clone, Debug)]
 pub struct Config {
@@ -34,7 +36,10 @@ pub struct Config {
     pub database_lifetime: u64,
 }
 
-pub async fn read() -> Result<Config, ServerError> {
+pub async fn read() -> Result<Config> {
     dotenv().ok();
-    Config::init_from_env().map_err(|err| ServerError::Config(err.to_string()))
+    Config::init_from_env().map_err(|error| {
+        error!("Failed to load config: {error:#?}");
+        ServerError::GenericError.into()
+    })
 }

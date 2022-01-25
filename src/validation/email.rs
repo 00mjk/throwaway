@@ -1,5 +1,7 @@
 use validator::ValidationError;
 
+// FIXME: Don't do this. Should we have static/const errors instead? Or specific ValidationError enum of errors? and use
+// #[from]
 const MISSING_EMAIL: &str = "missing_email";
 const INVALID_EMAIL: &str = "invalid_email";
 const INVALID_EMAIL_DOMAIN: &str = "invalid_email_domain";

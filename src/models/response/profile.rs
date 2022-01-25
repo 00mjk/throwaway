@@ -1,10 +1,10 @@
 use serde::Serialize;
 
+use crate::models::public::profile::ProfilePublic;
+
 #[derive(Serialize, Debug)]
 pub struct ProfilePatchResponse {
-    pub name: Option<String>,
-    pub email: Option<String>,
-    pub password: Option<String>,
-    pub country: Option<String>,
-    pub timezone: Option<String>,
+    pub message: String,
+    pub code: usize,
+    pub profile: Option<ProfilePublic>,
 }
