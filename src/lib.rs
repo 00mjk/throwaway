@@ -7,13 +7,11 @@
 #![allow(clippy::must_use_candidate)]
 #![feature(once_cell)]
 
-use std::net::SocketAddr;
-
 use anyhow::Result;
+use axum::AddExtensionLayer;
 use axum::Router;
-use axum::{AddExtensionLayer, Server};
 use sqlx::migrate;
-use tracing::{debug, info};
+use tracing::debug;
 
 use crate::cache::Cache;
 use crate::config::Config;
@@ -41,7 +39,7 @@ pub mod repositories;
 pub mod services;
 pub mod validation;
 
-pub async fn start_server() -> Result<()> {
+pub async fn build_app() -> Result<Router> {
     logging::init()?;
 
     let config: Config = config::read().await?;
@@ -68,9 +66,10 @@ pub async fn start_server() -> Result<()> {
     // Services
     let token_service = TokenService::new(&secrets.jwt);
     let password_service = PasswordService::new();
-    let healthcheck_service = HealthcheckService::new(healthcheck_repository.clone());
-    let profile_service = ProfileService::new(password_service.clone(), profile_repository.clone());
+    let healthcheck_service = HealthcheckService::new(healthcheck_repository);
+    let profile_service = ProfileService::new(password_service.clone(), profile_repository);
 
+    // App
     let app = Router::new()
         .merge(healthcheck::routes())
         .merge(register::routes())
@@ -81,13 +80,5 @@ pub async fn start_server() -> Result<()> {
         .layer(AddExtensionLayer::new(healthcheck_service))
         .layer(AddExtensionLayer::new(profile_service));
 
-    let address = SocketAddr::from(([0, 0, 0, 0], config.app_port));
-    info!("Listening on: {address}");
-
-    Server::bind(&address)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
-
-    Ok(())
+    Ok(app)
 }

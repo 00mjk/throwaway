@@ -1,14 +1,32 @@
+use std::net::{SocketAddr, TcpListener};
+
 use anyhow::Error;
 use axum::http::Request;
 use hyper::body::to_bytes;
 use hyper::{Body, Client, Method};
 use rand_core::{OsRng, RngCore};
 use serde_json::{from_slice, json, Value};
+use throwaway::build_app;
 
 #[tokio::test]
 async fn test_e2e() -> Result<(), Error> {
     let random_id = OsRng.next_u64();
     let client = Client::new();
+
+    // Start API
+    let app = build_app().await?;
+
+    let socket_address = SocketAddr::from(([127, 0, 0, 1], 8000));
+    let listener = TcpListener::bind(socket_address)?;
+
+    let address = listener.local_addr().unwrap();
+    tokio::spawn(async move {
+        axum::Server::from_tcp(listener)
+            .unwrap()
+            .serve(app.into_make_service())
+            .await
+            .unwrap();
+    });
 
     // Part 1: Register
     let email = format!("test-{random_id}@domain.test");
@@ -24,7 +42,7 @@ async fn test_e2e() -> Result<(), Error> {
 
     println!("Register Request: {register_request_body:#?}");
     let register_request = Request::builder()
-        .uri("http://0.0.0.0:8000/register")
+        .uri(format!("http://{address}/register"))
         .method(Method::POST)
         .header("Content-Type", "application/json")
         .body(Body::from(register_request_body.to_string()))?;
@@ -48,7 +66,7 @@ async fn test_e2e() -> Result<(), Error> {
 
     println!("Token Request: {token_request_body:#?}");
     let token_request = Request::builder()
-        .uri("http://0.0.0.0:8000/token")
+        .uri(format!("http://{address}/token"))
         .method(Method::POST)
         .header("Content-Type", "application/json")
         .body(Body::from(token_request_body.to_string()))?;
@@ -71,7 +89,7 @@ async fn test_e2e() -> Result<(), Error> {
 
     println!("Patch Request: {patch_request_body:#?}");
     let patch_request = Request::builder()
-        .uri("http://0.0.0.0:8000/profile")
+        .uri(format!("http://{address}/profile"))
         .method(Method::PATCH)
         .header("Content-Type", "application/json")
         .header("Authorization", format!("Bearer {token}"))

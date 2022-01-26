@@ -55,7 +55,4 @@ jobs:
           flux get all --all-namespaces
 
       - name: Run tests
-        run: |
-          cargo build
-          cargo run &
-          ./scripts/test.sh
+        run: ./scripts/test.sh

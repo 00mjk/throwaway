@@ -7,8 +7,6 @@ use crate::errors::internal::ServerError;
 
 #[derive(Envconfig, Clone, Debug)]
 pub struct Config {
-    #[envconfig(from = "APP_PORT")]
-    pub app_port: u16,
     #[envconfig(from = "APP_VERSION")]
     pub app_version: String,
     #[envconfig(from = "APP_LOG_LEVEL")]

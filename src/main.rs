@@ -7,10 +7,24 @@
 #![allow(clippy::must_use_candidate)]
 #![feature(once_cell)]
 
+use std::net::SocketAddr;
+
 use anyhow::Error;
-use throwaway::start_server;
+use hyper::Server;
+use throwaway::build_app;
+use tracing::info;
 
 #[tokio::main]
 pub async fn main() -> Result<(), Error> {
-    start_server().await
+    let app = build_app().await?;
+
+    let address = SocketAddr::from(([0, 0, 0, 0], 8000));
+    info!("Listening on: {address}");
+
+    Server::bind(&address)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
+
+    Ok(())
 }
