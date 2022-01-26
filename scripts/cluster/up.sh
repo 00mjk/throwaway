@@ -40,9 +40,9 @@ flux reconcile kustomization throwaway --with-source
 echo "Waiting for Flux to reconcile"
 kubectl --namespace flux-system wait kustomization/flux-system --for=condition=ready --timeout=5m
 
-echo "Waiting for Vault to come up..."
-until curl --silent --head --fail http://vault.127.0.0.1.nip.io/v1/sys/health; do
-  sleep 15
+echo "Waiting for Vault to come up"
+until curl --silent --head --fail --output /dev/null http://vault.127.0.0.1.nip.io/v1/sys/health; do
+  sleep 5
 done
 
 # FIXME: Really not a fan of this...
@@ -56,6 +56,11 @@ fi
 terraform init -upgrade
 terraform apply -auto-approve
 popd
+
+echo "Waiting for Database to come up"
+until nc -z localhost 5432; do
+  sleep 5
+done
 
 # FIXME: Move to app itself performing provision
 echo "Provisioning Database"
