@@ -3,6 +3,8 @@ set -euo pipefail
 
 if ! (k3d cluster list | grep -q throwaway); then
   echo "Starting cluster"
+
+  # FIXME: Look into caching strategies for K3d images - https://github.com/rancher/k3d/issues/906
   k3d cluster create throwaway \
     --api-port 127.0.0.1:6443 \
     --k3s-arg "--no-deploy=traefik@server:*" \
@@ -44,6 +46,7 @@ echo "Waiting for Vault to come up"
 until curl --silent --head --fail --output /dev/null http://vault.127.0.0.1.nip.io/v1/sys/health; do
   sleep 5
 done
+sleep 3
 
 # FIXME: Really not a fan of this...
 echo "Provisioning Vault"
@@ -61,6 +64,7 @@ echo "Waiting for Database to come up"
 until nc -z localhost 5432; do
   sleep 5
 done
+sleep 3
 
 # FIXME: Move to app itself performing provision
 echo "Provisioning Database"
