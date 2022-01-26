@@ -1,0 +1,47 @@
+name: Coverage
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '*.rs'
+    branches:
+      - master
+
+env:
+  RUST_VERSION: nightly
+
+jobs:
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: "${{ env.RUST_VERSION }}"
+
+      - name: Cache Cargo
+        uses: Swatinem/rust-cache@v1
+
+      - name: Run cargo tarpaulin
+        uses: actions-rs/tarpaulin@v0.1
+        with:
+          version: '0.15.0'
+          out-type: Html
+          args: '--lib --bins'
+
+      - name: Move coverage report
+        run: |
+          mkdir -p build
+          mv tarpaulin-report.html build/index.html
+
+      - name: Deploy coverage report
+        uses: JamesIves/github-pages-deploy-action@v4.2.2
+        with:
+          branch: coverage-pages
+          folder: build

@@ -9,7 +9,7 @@ use serde_json::{from_slice, json, Value};
 use throwaway::build_app;
 
 #[tokio::test]
-async fn test_e2e() -> Result<(), Error> {
+async fn test_integration() -> Result<(), Error> {
     let random_id = OsRng.next_u64();
     let client = Client::new();
 

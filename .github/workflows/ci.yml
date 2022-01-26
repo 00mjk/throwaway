@@ -3,6 +3,8 @@ name: CI
 on:
   workflow_dispatch:
   push:
+    paths:
+      - '*.rs'
 
 env:
   RUST_VERSION: nightly
@@ -47,22 +49,60 @@ jobs:
       - name: Run linters
         run: ./scripts/lint.sh
 
-# FIXME: Make this only run 'unit' tests
-#  test:
-#    name: Test
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v2
-#
-#      - name: Setup Rust
-#        uses: actions-rs/toolchain@v1
-#        with:
-#          profile: minimal
-#          toolchain: "${{ env.RUST_VERSION }}"
-#
-#      - name: Cache Cargo
-#        uses: Swatinem/rust-cache@v1
-#
-#      - name: Run tests
-#        run: ./scripts/test.sh
+  unit:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: "${{ env.RUST_VERSION }}"
+
+      - name: Cache Cargo
+        uses: Swatinem/rust-cache@v1
+
+      - name: Run unit tests
+        run: ./scripts/test_unit.sh
+
+  integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Checkout Terraform repository
+        uses: actions/checkout@v2
+        with:
+          repository: CathalMullan/throwaway-terraform
+          path: throwaway-terraform
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: "${{ env.RUST_VERSION }}"
+
+      - name: Cache Cargo
+        uses: Swatinem/rust-cache@v1
+
+      - name: Install PSQL
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends postgresql-client
+
+      - name: Download K3d
+        run: curl --silent --fail https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
+
+      - name: Download Flux
+        run: curl --silent --fail https://fluxcd.io/install.sh | bash
+
+      - name: Bring up cluster
+        run: ./scripts/cluster/up.sh
+
+      - name: Run integration tests
+        run: ./scripts/test_integration.sh

@@ -181,8 +181,8 @@ Showcase generated Terraform Module capabilities.
 
 ## Tests
 - Unit
-- Mutation
-- E2E
+- Integration
+- Mutation (?)
 
 ## Other
 Do we allow nested endpoints? `/balance/history` ?

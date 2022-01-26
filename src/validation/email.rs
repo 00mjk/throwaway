@@ -35,3 +35,23 @@ pub fn validate_email(email: &str) -> Result<(), ValidationError> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_validate_email() {
+        let tests = vec![("email@here.com", true), ("", false)];
+
+        for (email, expected_valid) in tests {
+            let valid = validate_email(email);
+
+            if expected_valid {
+                assert!(valid.is_ok());
+            } else {
+                assert!(valid.is_err());
+            }
+        }
+    }
+}
