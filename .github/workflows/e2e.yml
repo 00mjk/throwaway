@@ -27,11 +27,26 @@ jobs:
           profile: minimal
           toolchain: "${{ env.RUST_VERSION }}"
 
+      - name: Cache Cargo
+        uses: actions/cache@v2
+        with:
+          key: "${{ runner.os }}-e2e-${{ hashFiles('**/Cargo.lock') }}"
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+
       - name: Download K3d
         run: curl --silent --fail https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
 
       - name: Download Flux
         run: curl --silent --fail https://fluxcd.io/install.sh | bash
+
+      - name: Install SQLX CLI
+        uses: baptiste0928/cargo-install@v1
+        with:
+          crate: sqlx-cli
+          version: "0.5.*"
 
       - name: Bring up cluster
         run: ./scripts/cluster/up.sh

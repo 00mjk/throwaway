@@ -58,9 +58,7 @@ terraform apply -auto-approve
 popd
 
 # FIXME: Move to app itself performing provision
-# FIXME: For now, figure out how to cache this and main app build, compiles times are 3x local on CI
 echo "Provisioning Database"
-cargo install --locked --version 0.5.* sqlx-cli
 cd sql
 export DATABASE_URL="postgresql://postgres:password@localhost:5432/postgres"
 cargo sqlx migrate run
