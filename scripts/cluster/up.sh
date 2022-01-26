@@ -43,7 +43,7 @@ echo "Waiting for Flux to reconcile"
 kubectl --namespace flux-system wait kustomization/flux-system --for=condition=ready --timeout=5m
 
 echo "Waiting for Vault to come up"
-until curl --silent --head --fail http://vault.127.0.0.1.nip.io/v1/sys/health; do
+until curl --silent --head --fail --output /dev/null http://vault.127.0.0.1.nip.io/v1/sys/health; do
   sleep 3
 done
 
@@ -60,8 +60,7 @@ terraform apply -auto-approve
 popd
 
 echo "Waiting for Database to come up"
-docker pull postgres:alpine
-until docker run --rm postgres:alpine psql -Atx "host=host.docker.internal port=5432 dbname=postgres user=postgres password=password" -c "SELECT 1"; do
+until psql "host=localhost port=5432 dbname=postgres user=postgres password=password" -c "SELECT 1"; do
   sleep 3
 done
 
