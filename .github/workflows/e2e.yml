@@ -47,12 +47,6 @@ jobs:
       - name: Download Flux
         run: curl --silent --fail https://fluxcd.io/install.sh | bash
 
-      - name: Install SQLX CLI
-        uses: baptiste0928/cargo-install@v1
-        with:
-          crate: sqlx-cli
-          version: "0.5.*"
-
       - name: Bring up cluster
         run: ./scripts/cluster/up.sh
 

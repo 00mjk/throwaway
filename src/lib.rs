@@ -12,6 +12,7 @@ use std::net::SocketAddr;
 use anyhow::Result;
 use axum::Router;
 use axum::{AddExtensionLayer, Server};
+use sqlx::migrate;
 use tracing::{debug, info};
 
 use crate::cache::Cache;
@@ -54,6 +55,11 @@ pub async fn start_server() -> Result<()> {
 
     let cache_pool: CachePool = cache::connect(&config, &secrets.cache).await?;
     let cache: Cache = cache::Cache::new(cache_pool);
+
+    // Database Provision
+    migrate!("sql/migrations")
+        .run(&database)
+        .await?;
 
     // Repositories
     let healthcheck_repository = HealthcheckRepository::new(database.clone(), cache.clone());

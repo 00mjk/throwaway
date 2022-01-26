@@ -1,8 +1,7 @@
 #!/usr/bin/env sh
 set -e
 
-echo "Running migrations..."
-/opt/docker/migrations.sh
-
-echo "Starting API..."
-/opt/docker/hot_reload.sh
+cargo build
+while true; do
+  cargo watch --why --watch src --exec run
+done

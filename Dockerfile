@@ -1,7 +1,7 @@
 FROM rustlang/rust:nightly-alpine
 MAINTAINER Cathal Mullan <contact@cathal.dev>
 
-ENV RUSTFLAGS "-C target-feature=-crt-static --cfg tokio_unstable"
+ENV RUSTFLAGS "-C target-feature=-crt-static --cfg tokio_unstable --cfg sqlx_macros_unstable"
 
 RUN apk add --update \
     ca-certificates \
@@ -12,7 +12,6 @@ RUN apk add --update \
     jq
 
 RUN cargo install cargo-watch
-RUN cargo install --locked --version 0.5.* sqlx-cli
 
 WORKDIR app
 

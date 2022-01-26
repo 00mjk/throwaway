@@ -63,9 +63,3 @@ echo "Waiting for Database to come up"
 until psql "host=localhost port=5432 dbname=postgres user=postgres password=password" -c "SELECT 1"; do
   sleep 3
 done
-
-# FIXME: Move to app itself performing provision
-echo "Provisioning Database"
-cd sql
-export DATABASE_URL="postgresql://postgres:password@localhost:5432/postgres"
-cargo sqlx migrate run
