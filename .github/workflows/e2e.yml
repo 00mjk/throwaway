@@ -28,13 +28,7 @@ jobs:
           toolchain: "${{ env.RUST_VERSION }}"
 
       - name: Cache Cargo
-        uses: actions/cache@v2
-        with:
-          key: "${{ runner.os }}-e2e-${{ hashFiles('**/Cargo.lock') }}"
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
+        uses: Swatinem/rust-cache@v1
 
       - name: Install PSQL
         run: |

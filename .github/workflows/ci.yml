@@ -22,13 +22,7 @@ jobs:
           toolchain: "${{ env.RUST_VERSION }}"
 
       - name: Cache Cargo
-        uses: actions/cache@v2
-        with:
-          key: "${{ runner.os }}-build-${{ hashFiles('**/Cargo.lock') }}"
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
+        uses: Swatinem/rust-cache@v1
 
       - name: Build package
         run: ./scripts/build.sh
@@ -48,13 +42,7 @@ jobs:
           components: rustfmt, clippy
 
       - name: Cache Cargo
-        uses: actions/cache@v2
-        with:
-          key: "${{ runner.os }}-lint-${{ hashFiles('**/Cargo.lock') }}"
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
+        uses: Swatinem/rust-cache@v1
 
       - name: Run linters
         run: ./scripts/lint.sh
@@ -74,13 +62,7 @@ jobs:
 #          toolchain: "${{ env.RUST_VERSION }}"
 #
 #      - name: Cache Cargo
-#        uses: actions/cache@v2
-#        with:
-#          key: "${{ runner.os }}-test-${{ hashFiles('**/Cargo.lock') }}"
-#          path: |
-#            ~/.cargo/registry
-#            ~/.cargo/git
-#            target
+#        uses: Swatinem/rust-cache@v1
 #
 #      - name: Run tests
 #        run: ./scripts/test.sh
