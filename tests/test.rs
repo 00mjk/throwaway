@@ -3,7 +3,7 @@ use axum::http::Request;
 use hyper::body::to_bytes;
 use hyper::{Body, Client, Method};
 use rand_core::{OsRng, RngCore};
-use serde_json::{from_slice, json, to_string_pretty, Value};
+use serde_json::{from_slice, json, Value};
 
 #[tokio::test]
 async fn test_e2e() -> Result<(), Error> {
@@ -22,7 +22,7 @@ async fn test_e2e() -> Result<(), Error> {
         "timezone": "GMT"
     });
 
-    println!("Register Request: {}", to_string_pretty(&register_request_body)?);
+    println!("Register Request: {register_request_body:#?}");
     let register_request = Request::builder()
         .uri("http://0.0.0.0:8000/register")
         .method(Method::POST)
@@ -33,12 +33,11 @@ async fn test_e2e() -> Result<(), Error> {
     let register_response_bytes = to_bytes(register_response.into_body()).await?;
 
     let register_response_body: Value = from_slice(&register_response_bytes)?;
-    println!("Register Response: {}", to_string_pretty(&register_response_body)?);
+    println!("Register Response: {register_response_body:#?}");
 
-    let profile_id: String = register_response_body
-        .get("profile_id")
-        .unwrap()
-        .to_string();
+    let profile_id = register_response_body["profile_id"]
+        .as_str()
+        .unwrap();
     assert!(!profile_id.is_empty());
 
     // Part 2: Fetch Token
@@ -47,7 +46,7 @@ async fn test_e2e() -> Result<(), Error> {
         "password": password,
     });
 
-    println!("Token Request: {}", to_string_pretty(&register_request_body)?);
+    println!("Token Request: {token_request_body:#?}");
     let token_request = Request::builder()
         .uri("http://0.0.0.0:8000/token")
         .method(Method::POST)
@@ -58,21 +57,19 @@ async fn test_e2e() -> Result<(), Error> {
     let token_response_bytes = to_bytes(token_response.into_body()).await?;
 
     let token_response_body: Value = from_slice(&token_response_bytes)?;
-    println!("Token Response: {}", to_string_pretty(&token_response_body)?);
+    println!("Token Response: {token_response_body:#?}");
 
-    let token = token_response_body
-        .get("token")
-        .unwrap()
+    let token = token_response_body["token"]
         .as_str()
         .unwrap();
     assert!(!token.is_empty());
 
-    // Part 2: Patch Profile
+    // Part 3: Patch Profile
     let patch_request_body: Value = json!({
         "name": "Updated",
     });
 
-    println!("Patch Request: {}", to_string_pretty(&patch_request_body)?);
+    println!("Patch Request: {patch_request_body:#?}");
     let patch_request = Request::builder()
         .uri("http://0.0.0.0:8000/profile")
         .method(Method::PATCH)
@@ -84,7 +81,7 @@ async fn test_e2e() -> Result<(), Error> {
     let patch_response_bytes = to_bytes(patch_response.into_body()).await?;
 
     let patch_response_body: Value = from_slice(&patch_response_bytes)?;
-    println!("Patch Response: {}", to_string_pretty(&patch_response_body)?);
+    println!("Patch Response: {patch_response_body:#?}");
 
     let patch_response_country = patch_response_body["profile"]["name"]
         .as_str()

@@ -1,9 +1,8 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
-    branches:
-      - master
 
 env:
   RUST_VERSION: nightly
@@ -42,18 +41,19 @@ jobs:
       - name: Run linters
         run: ./scripts/lint.sh
 
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: "${{ env.RUST_VERSION }}"
-
-      - name: Run tests
-        run: ./scripts/test.sh
+# FIXME: Make this only run 'unit' tests
+#  test:
+#    name: Test
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v2
+#
+#      - name: Setup Rust
+#        uses: actions-rs/toolchain@v1
+#        with:
+#          profile: minimal
+#          toolchain: "${{ env.RUST_VERSION }}"
+#
+#      - name: Run tests
+#        run: ./scripts/test.sh

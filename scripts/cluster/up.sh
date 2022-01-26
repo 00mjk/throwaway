@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Cluster
 if ! (k3d cluster list | grep -q throwaway); then
+  echo "Starting cluster"
   k3d cluster create throwaway \
     --api-port 127.0.0.1:6443 \
     --k3s-arg "--no-deploy=traefik@server:*" \
@@ -11,25 +11,24 @@ if ! (k3d cluster list | grep -q throwaway); then
     --port "5432:5432@loadbalancer" \
     --port "6379:6379@loadbalancer" \
     --wait
-
-  k3d kubeconfig merge throwaway --kubeconfig-switch-context
-else
-  kubectl cluster-info
 fi
 
-# Infrastructure
+echo "Showing cluster info"
+kubectl cluster-info
+
+echo "Running Flux checks"
 flux check --pre
+
+echo "Installing Flux"
 flux install
 
+echo "Configuring Git source"
 flux create source git throwaway \
   --url https://github.com/CathalMullan/throwaway-flux \
   --branch master \
   --interval 3m
 
-flux create secret git flux-system \
-  --url ssh://git@github.com/CathalMullan/throwaway-flux \
-  --private-key-file ~/.ssh/id_ed25519
-
+echo "Applying Flux manifests"
 flux create kustomization throwaway \
   --source GitRepository/throwaway \
   --path "clusters/dev" \
@@ -38,13 +37,30 @@ flux create kustomization throwaway \
 
 flux reconcile kustomization throwaway --with-source
 
-# Secrets
+echo "Waiting for Flux to reconcile"
+kubectl --namespace flux-system wait kustomization/flux-system --for=condition=ready --timeout=5m
+
 echo "Waiting for Vault to come up..."
 until curl --silent --head --fail http://vault.127.0.0.1.nip.io/v1/sys/health; do
   sleep 15
 done
 
-pushd ~/workspace/throwaway-terraform/environment/dev
+# FIXME: Really not a fan of this...
+echo "Provisioning Vault"
+if [ "$(uname)" == "Darwin" ]; then
+  pushd "${HOME}/workspace/throwaway-terraform/environment/dev"
+else
+  pushd "/home/runner/work/throwaway/throwaway/throwaway-terraform/environment/dev"
+fi
+
 terraform init -upgrade
 terraform apply -auto-approve
 popd
+
+# FIXME: Move to app itself performing provision
+# FIXME: For now, figure out how to cache this and main app build, compiles times are 3x local on CI
+echo "Provisioning Database"
+cargo install --locked --version 0.5.* sqlx-cli
+cd sql
+export DATABASE_URL="postgresql://postgres:password@localhost:5432/postgres"
+cargo sqlx migrate run
