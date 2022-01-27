@@ -48,16 +48,19 @@ pub enum ServerError {
     #[error("[Vault Client]: {0}")]
     VaultClientError(#[from] vaultrs::error::ClientError),
 
-    #[error("[Header]: {0}")]
+    #[error("[Hyper]: {0}")]
+    HyperError(#[from] hyper::Error),
+
+    #[error("[Axum Header]: {0}")]
     AxumTypedHeaderError(#[from] axum::extract::rejection::TypedHeaderRejection),
 
-    #[error("[Extension]: {0}")]
+    #[error("[Axum Extension]: {0}")]
     AxumExtensionError(#[from] axum::extract::rejection::ExtensionRejection),
 
-    #[error("[Form]: {0}")]
+    #[error("[Axum Form]: {0}")]
     AxumFormRejection(#[from] axum::extract::rejection::FormRejection),
 
-    #[error("[Json]: {0}")]
+    #[error("[Axum Json]: {0}")]
     AxumJsonRejection(#[from] axum::extract::rejection::JsonRejection),
 
     #[error("[Profile]: {0}")]
@@ -70,10 +73,7 @@ pub enum ServerError {
 impl IntoResponse for ServerError {
     fn into_response(self) -> Response {
         let (status, message) = match self {
-            ServerError::ValidationError(_) => {
-                let message = format!("Input validation error: [{:?}]", self);
-                (StatusCode::BAD_REQUEST, message)
-            }
+            ServerError::ValidationError(err) => (StatusCode::BAD_REQUEST, err.to_string()),
             ServerError::ProfileError(error) => {
                 return error.into_response();
             }
