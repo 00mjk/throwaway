@@ -1,6 +1,7 @@
-use anyhow::Result;
+use tracing::error;
 
 use crate::database::DatabasePool;
+use crate::errors::internal::ServerError;
 use crate::Cache;
 
 #[derive(Clone)]
@@ -17,7 +18,9 @@ impl HealthcheckRepository {
         }
     }
 
-    pub async fn table_exists(&self, table_schema: &str, table_name: &str) -> Result<(String, bool)> {
+    // No idea why this is flagging the linter up, assuming it's a library bug?
+    #[allow(clippy::missing_panics_doc)]
+    pub async fn table_exists(&self, table_schema: &str, table_name: &str) -> Result<(String, bool), ServerError> {
         let identifier = format!("{table_schema}.{table_name}");
         let cache_key = format!("table_exists_{identifier}");
         if let Some(result) = self.cache.get(&cache_key).await {
@@ -37,17 +40,20 @@ impl HealthcheckRepository {
             table_name,
         );
 
-        let result: bool = query
-            .fetch_one(&self.database)
-            .await
-            .unwrap()
-            .exists
-            .unwrap();
+        match query.fetch_one(&self.database).await {
+            Ok(output) => {
+                let exists: bool = output.exists.unwrap();
 
-        self.cache
-            .set(&cache_key, result, 60)
-            .await;
+                self.cache
+                    .set(&cache_key, exists, 60)
+                    .await;
 
-        Ok((identifier, result))
+                Ok((identifier, exists))
+            }
+            Err(error) => {
+                error!("Could not find existing Profile by email: {error:#?}");
+                Err(ServerError::GenericError)
+            }
+        }
     }
 }

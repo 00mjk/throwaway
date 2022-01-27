@@ -20,7 +20,7 @@ impl TokenService {
         }
     }
 
-    pub fn generate(&self, profile_id: Uuid) -> String {
+    pub fn generate(&self, profile_id: Uuid) -> Result<String, ServerError> {
         let now = Utc::now();
         let duration = Duration::minutes(15);
         let expiration = now + duration;
@@ -35,7 +35,7 @@ impl TokenService {
         let encoding_key = EncodingKey::from_secret(self.jwt_password.as_bytes());
         let token = encode(&Header::default(), &claims, &encoding_key);
 
-        token.unwrap()
+        token.map_err(ServerError::JwtError)
     }
 
     pub fn decode(&self, token: &str) -> Result<Claims, ServerError> {
@@ -49,8 +49,8 @@ impl TokenService {
 
         return match token_data {
             Ok(token) => Ok(token.claims),
-            Err(err) => {
-                match err.kind() {
+            Err(error) => {
+                match error.kind() {
                     ErrorKind::InvalidToken => Err(TokenError::InvalidToken.into()),
                     ErrorKind::InvalidIssuer => Err(TokenError::InvalidIssuer.into()),
                     ErrorKind::ExpiredSignature => Err(TokenError::ExpiredToken.into()),

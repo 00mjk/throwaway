@@ -34,7 +34,7 @@ pub struct Config {
     pub database_lifetime: u64,
 }
 
-pub async fn read() -> Result<Config> {
+pub fn read() -> Result<Config> {
     dotenv().ok();
     Config::init_from_env().map_err(|error| {
         error!("Failed to load config: {error:#?}");

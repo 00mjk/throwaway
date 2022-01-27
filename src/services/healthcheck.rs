@@ -35,17 +35,20 @@ impl HealthcheckService {
             .table_exists("pg_catalog", "pg_statistic");
 
         let results = try_join_all([pg_database_exists, pg_index_exists, pg_statistic_exists]).await;
-        if let Err(error) = results {
-            error!("Healthcheck error: {error:#?}");
-            return Err(ServerError::GenericError);
+        match results {
+            // FIXME: Don't build response here...
+            Ok(output) => {
+                Ok(HealthcheckResponse {
+                    ok: true,
+                    database: HealthDatabaseResponse {
+                        tables: output.into_iter().collect(),
+                    },
+                })
+            }
+            Err(error) => {
+                error!("Healthcheck error: {error:#?}");
+                Err(ServerError::GenericError)
+            }
         }
-
-        // FIXME: Don't build response here...
-        Ok(HealthcheckResponse {
-            ok: true,
-            database: HealthDatabaseResponse {
-                tables: results.unwrap().into_iter().collect(),
-            },
-        })
     }
 }

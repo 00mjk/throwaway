@@ -1,3 +1,7 @@
+[alias]
+unit = ["test", "--lib", "--bins", "--", "--nocapture"]
+integration = ["test", "--test", "*", "--", "--nocapture"]
+
 [build]
 rustflags = [
   "--cfg", "tokio_unstable",

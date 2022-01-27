@@ -1,11 +1,10 @@
 #![deny(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
 #![allow(clippy::module_name_repetitions)]
-#![allow(clippy::unused_async)]
 #![allow(clippy::missing_errors_doc)]
-#![allow(clippy::missing_panics_doc)]
 #![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::must_use_candidate)]
 #![feature(once_cell)]
+#![feature(map_first_last)]
 
 use anyhow::Result;
 use axum::AddExtensionLayer;
@@ -42,7 +41,7 @@ pub mod validation;
 pub async fn build_app() -> Result<Router> {
     logging::init()?;
 
-    let config: Config = config::read().await?;
+    let config: Config = config::read()?;
     debug!("Config: {config:#?}");
 
     let secrets: Secrets = secrets::read(&config).await?;
@@ -51,7 +50,7 @@ pub async fn build_app() -> Result<Router> {
     // Connection Pools
     let database: DatabasePool = database::connect(&config, &secrets.database).await?;
 
-    let cache_pool: CachePool = cache::connect(&config, &secrets.cache).await?;
+    let cache_pool: CachePool = cache::connect(&config, &secrets.cache)?;
     let cache: Cache = cache::Cache::new(cache_pool);
 
     // Database Provision

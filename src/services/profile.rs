@@ -108,7 +108,7 @@ impl ProfileService {
         let valid = self
             .password_service
             .verify(&password, &profile.password)
-            .await;
+            .await?;
 
         Ok((valid, profile))
     }

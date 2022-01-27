@@ -17,34 +17,37 @@ pub enum ServerError {
     #[error("An error has occurred")]
     GenericError,
 
-    #[error(transparent)]
+    #[error("Validation: {0}")]
     ValidationError(#[from] validator::ValidationErrors),
 
-    #[error(transparent)]
+    #[error("Serde: {0}")]
     SerdeJsonError(#[from] serde_json::Error),
 
-    #[error(transparent)]
+    #[error("SQL: {0}")]
     SqlxError(#[from] sqlx::Error),
 
-    #[error(transparent)]
+    #[error("Argon: {0}")]
+    ArgonPasswordError(#[from] argon2::password_hash::Error),
+
+    #[error("JWT: {0}")]
     JwtError(#[from] jsonwebtoken::errors::Error),
 
-    #[error(transparent)]
+    #[error("Typed Header: {0}")]
     AxumTypedHeaderError(#[from] axum::extract::rejection::TypedHeaderRejection),
 
-    #[error(transparent)]
+    #[error("Extension: {0}")]
     AxumExtensionError(#[from] axum::extract::rejection::ExtensionRejection),
 
-    #[error(transparent)]
+    #[error("Form: {0}")]
     AxumFormRejection(#[from] axum::extract::rejection::FormRejection),
 
-    #[error(transparent)]
+    #[error("Json: {0}")]
     AxumJsonRejection(#[from] axum::extract::rejection::JsonRejection),
 
-    #[error(transparent)]
+    #[error("Profile: {0}")]
     ProfileError(#[from] crate::errors::profile::ProfileError),
 
-    #[error(transparent)]
+    #[error("Token: {0}")]
     TokenError(#[from] crate::errors::token::TokenError),
 }
 

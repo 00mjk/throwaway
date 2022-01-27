@@ -3,4 +3,4 @@ set -euo pipefail
 
 cargo check
 cargo fmt --all
-cargo clippy --all --tests --all-targets --all-features
+cargo clippy --all --tests

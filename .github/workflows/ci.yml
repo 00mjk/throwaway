@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - '*.rs'
+      - '**/*.rs'
 
 env:
   RUST_VERSION: nightly
@@ -27,7 +27,7 @@ jobs:
         uses: Swatinem/rust-cache@v1
 
       - name: Build package
-        run: ./scripts/build.sh
+        run: cargo build
 
   lint:
     name: Lint
@@ -66,7 +66,7 @@ jobs:
         uses: Swatinem/rust-cache@v1
 
       - name: Run unit tests
-        run: ./scripts/test_unit.sh
+        run: cargo unit
 
   integration:
     name: Integration Tests
@@ -105,4 +105,4 @@ jobs:
         run: ./scripts/cluster/up.sh
 
       - name: Run integration tests
-        run: ./scripts/test_integration.sh
+        run: cargo integration

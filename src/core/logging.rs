@@ -15,10 +15,7 @@ pub fn init() -> Result<()> {
         return Err(ServerError::GenericError.into());
     }
 
-    let env_filter = EnvFilter::try_from_default_env()
-        .or_else(|_| EnvFilter::try_new("debug"))
-        .unwrap();
-
+    let env_filter = EnvFilter::try_from_default_env().or_else(|_| EnvFilter::try_new("debug"))?;
     let stdout_subscriber = tracing_subscriber::fmt::layer();
 
     let subscriber = Registry::default()

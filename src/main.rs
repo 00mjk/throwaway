@@ -1,11 +1,10 @@
 #![deny(clippy::all, clippy::pedantic, clippy::nursery, clippy::cargo)]
 #![allow(clippy::module_name_repetitions)]
-#![allow(clippy::unused_async)]
 #![allow(clippy::missing_errors_doc)]
-#![allow(clippy::missing_panics_doc)]
 #![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::must_use_candidate)]
 #![feature(once_cell)]
+#![feature(map_first_last)]
 
 use std::net::SocketAddr;
 
@@ -23,8 +22,7 @@ pub async fn main() -> Result<(), Error> {
 
     Server::bind(&address)
         .serve(app.into_make_service())
-        .await
-        .unwrap();
+        .await?;
 
     Ok(())
 }

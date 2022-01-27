@@ -20,20 +20,25 @@ impl PasswordService {
     pub async fn hash(&self, password: &str) -> Result<String, ServerError> {
         let salt = SaltString::generate(OsRng);
 
-        let password_hash: PasswordHash = self
+        let password_hash = self
             .argon2
-            .hash_password(password.as_bytes(), &salt)
-            .unwrap();
+            .hash_password(password.as_bytes(), &salt);
 
-        Ok(password_hash.to_string())
+        match password_hash {
+            Ok(password) => Ok(password.to_string()),
+            Err(err) => Err(ServerError::ArgonPasswordError(err)),
+        }
     }
 
-    pub async fn verify(&self, password: &str, password_hash: &str) -> bool {
-        let parsed_hash = PasswordHash::new(password_hash).unwrap();
+    pub async fn verify(&self, password: &str, password_hash: &str) -> Result<bool, ServerError> {
+        let parsed_hash = PasswordHash::new(password_hash)?;
 
-        self.argon2
+        let verified = self
+            .argon2
             .verify_password(password.as_bytes(), &parsed_hash)
-            .is_ok()
+            .is_ok();
+
+        Ok(verified)
     }
 }
 

@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use anyhow::Result;
 use deadpool_redis::{Config as RedisConfig, Runtime};
 use deadpool_redis::{Connection, Pool};
-use redis::{AsyncCommands, FromRedisValue, ToRedisArgs};
+use redis::{AsyncCommands, FromRedisValue, RedisResult, ToRedisArgs};
 use tracing::{error, info};
 
 use crate::config::Config;
@@ -12,7 +12,7 @@ use crate::models::secrets::cache::CacheSecrets;
 
 pub type CachePool = Pool;
 
-pub async fn connect(config: &Config, cache_secrets: &CacheSecrets) -> Result<CachePool> {
+pub fn connect(config: &Config, cache_secrets: &CacheSecrets) -> Result<CachePool> {
     let dsn = if config.use_local {
         cache_secrets.local_dsn()
     } else {
@@ -58,9 +58,15 @@ impl Cache {
         let mut cache = self.connection().await;
 
         if self.exists(key).await {
-            let result = cache.get(&key).await.unwrap();
-            info!("HIT | {key} | {result:#?}");
-            return Some(result);
+            let result = cache.get(&key).await;
+            return if let Ok(inner) = result {
+                info!("HIT | {key} | {inner:#?}");
+                Some(inner)
+            } else {
+                // FIXME: Perhaps log out more meaningfully info
+                info!("MISS | {key}");
+                None
+            };
         }
 
         info!("MISS | {key}");
@@ -74,25 +80,33 @@ impl Cache {
         let mut cache = self.connection().await;
 
         info!("SET | {key} | {value:#?}");
-        cache
+        let result = cache
             .set_ex::<_, _, ()>(&key, value, expiry)
-            .await
-            .unwrap();
+            .await;
+
+        if result.is_err() {
+            info!("Failed to set");
+        }
     }
 
     pub async fn delete(&self, key: &str) {
         let mut cache = self.connection().await;
 
         info!("DELETE | {key}");
-        cache.del::<_, ()>(&key).await.unwrap();
+        let result = cache.del::<_, ()>(&key).await;
+
+        if result.is_err() {
+            info!("Failed to delete");
+        }
     }
 
     pub async fn exists(&self, key: &str) -> bool {
         let mut cache = self.connection().await;
 
-        if cache.exists(&key).await.unwrap() {
-            info!("EXISTS | {key} | true");
-            return true;
+        let cache_exists: RedisResult<bool> = cache.exists(&key).await;
+        if let Ok(exists) = cache_exists {
+            info!("EXISTS | {key} | {exists}");
+            return exists;
         }
 
         info!("EXISTS | {key} | false");

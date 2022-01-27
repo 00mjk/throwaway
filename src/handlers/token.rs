@@ -31,7 +31,7 @@ pub async fn token_post(
     }
 
     // Generate token
-    let token = token_service.generate(profile.profile_id);
+    let token = token_service.generate(profile.profile_id)?;
     let token_response = TokenResponse {
         token,
     };

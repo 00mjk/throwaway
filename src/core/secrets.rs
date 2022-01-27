@@ -19,22 +19,16 @@ pub async fn read(config: &Config) -> Result<Secrets> {
     let settings = VaultClientSettingsBuilder::default()
         .address(&config.vault_url)
         .token(&config.vault_token)
-        .build()
-        .unwrap();
+        .build()?;
 
-    let client = VaultClient::new(settings).unwrap();
+    let client = VaultClient::new(settings)?;
 
-    let cache_secrets: CacheSecrets = kv2::read(&client, &config.vault_kv_mount, &config.vault_path_redis)
-        .await
-        .unwrap();
+    let cache_secrets: CacheSecrets = kv2::read(&client, &config.vault_kv_mount, &config.vault_path_redis).await?;
 
-    let database_secrets: DatabaseSecrets = kv2::read(&client, &config.vault_kv_mount, &config.vault_path_postgresql)
-        .await
-        .unwrap();
+    let database_secrets: DatabaseSecrets =
+        kv2::read(&client, &config.vault_kv_mount, &config.vault_path_postgresql).await?;
 
-    let jwt_secrets: JwtSecrets = kv2::read(&client, &config.vault_kv_mount, &config.vault_path_jwt)
-        .await
-        .unwrap();
+    let jwt_secrets: JwtSecrets = kv2::read(&client, &config.vault_kv_mount, &config.vault_path_jwt).await?;
 
     Ok(Secrets {
         cache: cache_secrets,
