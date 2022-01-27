@@ -3,10 +3,10 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::must_use_candidate)]
+#![allow(clippy::unused_async)]
 #![feature(once_cell)]
 #![feature(map_first_last)]
 
-use anyhow::Result;
 use axum::AddExtensionLayer;
 use axum::Router;
 use sqlx::migrate;
@@ -20,11 +20,10 @@ use crate::core::database;
 use crate::core::database::DatabasePool;
 use crate::core::logging;
 use crate::core::{cache, secrets};
+use crate::errors::internal::ServerError;
 use crate::handlers::{healthcheck, profile, register, token};
-use crate::repositories::healthcheck::HealthcheckRepository;
 use crate::repositories::profile::ProfileRepository;
 use crate::secrets::Secrets;
-use crate::services::healthcheck::HealthcheckService;
 use crate::services::password::PasswordService;
 use crate::services::profile::ProfileService;
 use crate::services::token::TokenService;
@@ -38,7 +37,7 @@ pub mod repositories;
 pub mod services;
 pub mod validation;
 
-pub async fn build_app() -> Result<Router> {
+pub async fn build_app() -> Result<Router, ServerError> {
     logging::init()?;
 
     let config: Config = config::read()?;
@@ -56,16 +55,15 @@ pub async fn build_app() -> Result<Router> {
     // Database Provision
     migrate!("sql/migrations")
         .run(&database)
-        .await?;
+        .await
+        .map_err(ServerError::SqlxMigrationError)?;
 
     // Repositories
-    let healthcheck_repository = HealthcheckRepository::new(database.clone(), cache.clone());
     let profile_repository = ProfileRepository::new(database.clone(), cache.clone());
 
     // Services
     let token_service = TokenService::new(&secrets.jwt);
     let password_service = PasswordService::new();
-    let healthcheck_service = HealthcheckService::new(healthcheck_repository);
     let profile_service = ProfileService::new(password_service.clone(), profile_repository);
 
     // App
@@ -76,7 +74,6 @@ pub async fn build_app() -> Result<Router> {
         .merge(profile::routes())
         .layer(AddExtensionLayer::new(token_service))
         .layer(AddExtensionLayer::new(password_service))
-        .layer(AddExtensionLayer::new(healthcheck_service))
         .layer(AddExtensionLayer::new(profile_service));
 
     Ok(app)

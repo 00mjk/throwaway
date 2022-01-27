@@ -52,7 +52,6 @@ chrono = { version = "0.4", features = ["serde"] }
 
 # Errors
 thiserror = "1.0"
-anyhow = "1.0"
 
 # Hashing
 argon2 = { version = "0.3", features = ["password-hash", "std"] }
@@ -64,9 +63,6 @@ tracing-subscriber = { version = "0.3", features = ["registry", "env-filter"] }
 tracing-futures = { version = "0.2", features = ["tokio"] }
 tracing-log = "0.1"
 tracing-error = "0.2"
-
-# TLS
-rustls = "0.20"
 
 # Secrets
 vaultrs = "0.5"

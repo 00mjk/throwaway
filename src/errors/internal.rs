@@ -7,44 +7,60 @@ use serde_json::json;
 use thiserror::Error;
 use tracing::error;
 
-// FIXME: Plan out error types ahead of time, DatabaseErrors, CacheErrors, RepositoryErrors, ServiceErrors ...
-// FIXME: Grep across the axum-examples project for ideas "enum.*Error"
-// FIXME: Don't make every error take an input, log out core details.
-// FIXME: Errors translate to response codes, so they're user facing
-
 #[derive(Error, Debug)]
 pub enum ServerError {
-    #[error("An error has occurred")]
-    GenericError,
-
-    #[error("Validation: {0}")]
+    #[error("[Validation]: {0}")]
     ValidationError(#[from] validator::ValidationErrors),
 
-    #[error("Serde: {0}")]
+    #[error("[Serde]: {0}")]
     SerdeJsonError(#[from] serde_json::Error),
 
-    #[error("SQL: {0}")]
+    #[error("[SQL]: {0}")]
     SqlxError(#[from] sqlx::Error),
 
-    #[error("Argon: {0}")]
+    #[error("[SQL Migration]: {0}")]
+    SqlxMigrationError(#[from] sqlx::migrate::MigrateError),
+
+    #[error("[Cache]: {0}")]
+    CacheError(#[from] deadpool_redis::CreatePoolError),
+
+    #[error("[Env Config]: {0}")]
+    EnvConfigError(#[from] envconfig::Error),
+
+    #[error("[Log Env]: {0}")]
+    LogEnvError(#[from] tracing_subscriber::filter::FromEnvError),
+
+    #[error("[Log Tracer]: {0}")]
+    LogTracerError(#[from] tracing::log::SetLoggerError),
+
+    #[error("[Log Subscriber]: {0}")]
+    LogSubscriberError(#[from] tracing::subscriber::SetGlobalDefaultError),
+
+    #[error("[Argon]: {0}")]
     ArgonPasswordError(#[from] argon2::password_hash::Error),
 
-    #[error("JWT: {0}")]
+    #[error("[JWT]: {0}")]
     JwtError(#[from] jsonwebtoken::errors::Error),
 
-    #[error("Typed Header: {0}")]
+    #[error("[Vault Client Config]: {0}")]
+    VaultClientConfigError(#[from] vaultrs::client::VaultClientSettingsBuilderError),
+
+    #[error("[Vault Client]: {0}")]
+    VaultClientError(#[from] vaultrs::error::ClientError),
+
+    #[error("[Header]: {0}")]
     AxumTypedHeaderError(#[from] axum::extract::rejection::TypedHeaderRejection),
 
-    #[error("Extension: {0}")]
+    #[error("[Extension]: {0}")]
     AxumExtensionError(#[from] axum::extract::rejection::ExtensionRejection),
 
-    #[error("Form: {0}")]
+    #[error("[Form]: {0}")]
     AxumFormRejection(#[from] axum::extract::rejection::FormRejection),
 
-    #[error("Json: {0}")]
+    #[error("[Json]: {0}")]
     AxumJsonRejection(#[from] axum::extract::rejection::JsonRejection),
 
-    #[error("Profile: {0}")]
+    #[error("[Profile]: {0}")]
     ProfileError(#[from] crate::errors::profile::ProfileError),
 
     #[error("Token: {0}")]

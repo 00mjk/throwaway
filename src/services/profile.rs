@@ -1,8 +1,7 @@
-use anyhow::Result;
 use sqlx::types::Uuid;
-use tracing::error;
 
 use crate::errors::internal::ServerError;
+use crate::errors::profile::ProfileError;
 use crate::models::database::profile::Profile;
 use crate::models::request::register::RegisterRequest;
 use crate::repositories::profile::ProfileRepository;
@@ -29,8 +28,7 @@ impl ProfileService {
             .await?;
 
         if profile_exists {
-            error!("Profile already exists");
-            return Err(ServerError::GenericError);
+            return Err(ProfileError::Exists.into());
         }
 
         let password_hash = self
@@ -68,8 +66,7 @@ impl ProfileService {
     pub async fn update_name(&self, profile_id: Uuid, name: String) -> Result<Profile, ServerError> {
         let mut profile: Profile = self.read(profile_id).await?;
         if name == profile.name {
-            error!("Name already set");
-            return Err(ServerError::GenericError);
+            return Err(ProfileError::NameSet.into());
         }
 
         profile.name = name.clone();
@@ -83,8 +80,7 @@ impl ProfileService {
     pub async fn update_email(&self, profile_id: Uuid, email: String) -> Result<Profile, ServerError> {
         let mut profile: Profile = self.read(profile_id).await?;
         if email == profile.email {
-            error!("Email already set");
-            return Err(ServerError::GenericError);
+            return Err(ProfileError::EmailSet.into());
         }
 
         profile.name = email.clone();
@@ -94,10 +90,6 @@ impl ProfileService {
 
         Ok(profile)
     }
-
-    // pub async fn delete(&self, profile_id: Uuid) -> Result<Profile, ServerError> {
-    //     todo!()
-    // }
 
     pub async fn verify_credentials(&self, email: String, password: String) -> Result<(bool, Profile), ServerError> {
         let profile = self

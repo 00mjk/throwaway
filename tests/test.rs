@@ -1,6 +1,6 @@
+use std::error::Error;
 use std::net::{SocketAddr, TcpListener};
 
-use anyhow::Error;
 use axum::http::Request;
 use hyper::body::to_bytes;
 use hyper::{Body, Client, Method};
@@ -9,7 +9,7 @@ use serde_json::{from_slice, json, Value};
 use throwaway::build_app;
 
 #[tokio::test]
-async fn test_integration() -> Result<(), Error> {
+async fn test_integration() -> Result<(), Box<dyn Error>> {
     let random_id = OsRng.next_u64();
     let client = Client::new();
 

@@ -1,4 +1,3 @@
-use anyhow::Result;
 use dotenv::dotenv;
 use envconfig::Envconfig;
 use tracing::error;
@@ -34,10 +33,10 @@ pub struct Config {
     pub database_lifetime: u64,
 }
 
-pub fn read() -> Result<Config> {
+pub fn read() -> Result<Config, ServerError> {
     dotenv().ok();
     Config::init_from_env().map_err(|error| {
         error!("Failed to load config: {error:#?}");
-        ServerError::GenericError.into()
+        ServerError::EnvConfigError(error)
     })
 }

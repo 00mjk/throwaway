@@ -11,15 +11,24 @@ pub enum ProfileError {
     #[error("Profile not found")]
     NotFound,
 
+    #[error("Profile already exists")]
+    Exists,
+
     #[error("Profile could not be updated")]
     UpdateFailure,
+
+    #[error("Profile name already set")]
+    NameSet,
+
+    #[error("Profile email already set")]
+    EmailSet,
 }
 
 impl IntoResponse for ProfileError {
     fn into_response(self) -> Response {
         let status = match self {
             ProfileError::NotFound => (StatusCode::NOT_FOUND),
-            ProfileError::UpdateFailure => (StatusCode::BAD_REQUEST),
+            _ => (StatusCode::BAD_REQUEST),
         };
 
         let body = Json(json!({

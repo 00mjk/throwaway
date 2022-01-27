@@ -1,4 +1,3 @@
-use anyhow::Result;
 use axum::extract::Extension;
 use axum::http::StatusCode;
 use axum::routing::patch;

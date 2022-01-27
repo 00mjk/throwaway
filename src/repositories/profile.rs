@@ -1,4 +1,3 @@
-use anyhow::Result;
 use sqlx::types::Uuid;
 use tracing::error;
 use tracing::instrument;

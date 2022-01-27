@@ -1,4 +1,3 @@
-use anyhow::Result;
 use axum::extract::Extension;
 use axum::http::StatusCode;
 use axum::routing::post;
@@ -6,6 +5,7 @@ use axum::{Json, Router};
 use tracing::info;
 
 use crate::errors::internal::ServerError;
+use crate::errors::token::TokenError;
 use crate::models::request::token::TokenRequest;
 use crate::models::response::token::TokenResponse;
 use crate::{ProfileService, TokenService};
@@ -21,13 +21,14 @@ pub async fn token_post(
 ) -> Result<(StatusCode, Json<TokenResponse>), ServerError> {
     info!("Token POST: {token_request:?}");
 
+    // FIXME: Can we move this to a extractor
     // Verify email and password are valid.
     let (valid_credentials, profile) = profile_service
         .verify_credentials(token_request.email, token_request.password)
         .await?;
 
     if !valid_credentials {
-        return Err(ServerError::GenericError);
+        return Err(TokenError::InvalidToken.into());
     }
 
     // Generate token

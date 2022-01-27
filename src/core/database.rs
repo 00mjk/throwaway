@@ -25,6 +25,6 @@ pub async fn connect(config: &Config, database_secrets: &DatabaseSecrets) -> Res
         .await
         .map_err(|error| {
             error!("Failed to connect to Postgres: {error:#?}");
-            ServerError::GenericError
+            ServerError::SqlxError(error)
         })
 }

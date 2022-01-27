@@ -1,10 +1,9 @@
 use std::fmt::Debug;
 
-use anyhow::Result;
 use deadpool_redis::{Config as RedisConfig, Runtime};
 use deadpool_redis::{Connection, Pool};
 use redis::{AsyncCommands, FromRedisValue, RedisResult, ToRedisArgs};
-use tracing::{error, info};
+use tracing::info;
 
 use crate::config::Config;
 use crate::errors::internal::ServerError;
@@ -12,7 +11,7 @@ use crate::models::secrets::cache::CacheSecrets;
 
 pub type CachePool = Pool;
 
-pub fn connect(config: &Config, cache_secrets: &CacheSecrets) -> Result<CachePool> {
+pub fn connect(config: &Config, cache_secrets: &CacheSecrets) -> Result<CachePool, ServerError> {
     let dsn = if config.use_local {
         cache_secrets.local_dsn()
     } else {
@@ -29,10 +28,7 @@ pub fn connect(config: &Config, cache_secrets: &CacheSecrets) -> Result<CachePoo
 
     redis_config
         .create_pool(Some(Runtime::Tokio1))
-        .map_err(|error| {
-            error!("Failed to connect to Redis: {error:#?}");
-            ServerError::GenericError.into()
-        })
+        .map_err(ServerError::CacheError)
 }
 
 #[derive(Clone)]
@@ -59,14 +55,10 @@ impl Cache {
 
         if self.exists(key).await {
             let result = cache.get(&key).await;
-            return if let Ok(inner) = result {
+            if let Ok(inner) = result {
                 info!("HIT | {key} | {inner:#?}");
-                Some(inner)
-            } else {
-                // FIXME: Perhaps log out more meaningfully info
-                info!("MISS | {key}");
-                None
-            };
+                return Some(inner);
+            }
         }
 
         info!("MISS | {key}");
