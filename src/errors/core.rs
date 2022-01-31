@@ -63,6 +63,9 @@ pub enum ServerError {
     #[error("[Axum Json]: {0}")]
     AxumJsonRejection(#[from] axum::extract::rejection::JsonRejection),
 
+    #[error("[Credentials]: {0}")]
+    CredentialsError(#[from] crate::errors::credentials::CredentialsError),
+
     #[error("[Profile]: {0}")]
     ProfileError(#[from] crate::errors::profile::ProfileError),
 
@@ -74,6 +77,9 @@ impl IntoResponse for ServerError {
     fn into_response(self) -> Response {
         let (status, message) = match self {
             ServerError::ValidationError(err) => (StatusCode::BAD_REQUEST, err.to_string()),
+            ServerError::CredentialsError(error) => {
+                return error.into_response();
+            }
             ServerError::ProfileError(error) => {
                 return error.into_response();
             }

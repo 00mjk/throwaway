@@ -1,0 +1,23 @@
+---
+name: Create Cluster
+description: Provision a K3d cluster for testing purposes
+runs:
+  using: composite
+  steps:
+    - name: Install PSQL
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install --yes --no-install-recommends postgresql-client
+
+    - name: Download K3d
+      shell: bash
+      run: curl --silent --fail https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
+
+    - name: Download Flux
+      shell: bash
+      run: curl --silent --fail https://fluxcd.io/install.sh | bash
+
+    - name: Bring up cluster
+      shell: bash
+      run: ./scripts/cluster/up.sh

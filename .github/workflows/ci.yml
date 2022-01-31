@@ -1,3 +1,4 @@
+---
 name: CI
 
 on:
@@ -90,19 +91,8 @@ jobs:
       - name: Cache Cargo
         uses: Swatinem/rust-cache@v1
 
-      - name: Install PSQL
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes --no-install-recommends postgresql-client
-
-      - name: Download K3d
-        run: curl --silent --fail https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
-
-      - name: Download Flux
-        run: curl --silent --fail https://fluxcd.io/install.sh | bash
-
-      - name: Bring up cluster
-        run: ./scripts/cluster/up.sh
+      - name: Create cluster
+        uses: ./.github/actions/throwaway-cluster
 
       - name: Run integration tests
         run: cargo integration

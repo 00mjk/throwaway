@@ -2,6 +2,7 @@ use std::error::Error;
 use std::net::{SocketAddr, TcpListener};
 
 use axum::http::Request;
+use base64::encode;
 use hyper::body::to_bytes;
 use hyper::{Body, Client, Method};
 use rand_core::{OsRng, RngCore};
@@ -48,6 +49,9 @@ async fn test_integration() -> Result<(), Box<dyn Error>> {
         .body(Body::from(register_request_body.to_string()))?;
 
     let register_response = client.request(register_request).await?;
+    let register_response_headers = register_response.headers();
+    println!("Register Response Headers: {register_response_headers:#?}");
+
     let register_response_bytes = to_bytes(register_response.into_body()).await?;
 
     let register_response_body: Value = from_slice(&register_response_bytes)?;
@@ -56,31 +60,33 @@ async fn test_integration() -> Result<(), Box<dyn Error>> {
     let profile_id = register_response_body["profile_id"]
         .as_str()
         .unwrap();
-    assert!(!profile_id.is_empty());
+    assert!(!profile_id.is_empty(), "Profile ID is empty");
 
     // Part 2: Fetch Token
-    let token_request_body: Value = json!({
-        "email": email,
-        "password": password,
-    });
+    let basic_authorization = format!("{email}:{password}");
+    let basic_authorization_encoded = encode(format!("{email}:{password}"));
 
-    println!("Token Request: {token_request_body:#?}");
+    println!("Token Request Headers: {basic_authorization:#?} -> {basic_authorization_encoded:#?}");
     let token_request = Request::builder()
         .uri(format!("http://{address}/token"))
         .method(Method::POST)
+        .header("Authorization", format!("Basic {basic_authorization_encoded}"))
         .header("Content-Type", "application/json")
-        .body(Body::from(token_request_body.to_string()))?;
+        .body(Body::empty())?;
 
     let token_response = client.request(token_request).await?;
+    let token_response_headers = token_response.headers();
+    println!("Token Response Headers: {token_response_headers:#?}");
+
     let token_response_bytes = to_bytes(token_response.into_body()).await?;
 
     let token_response_body: Value = from_slice(&token_response_bytes)?;
     println!("Token Response: {token_response_body:#?}");
 
-    let token = token_response_body["token"]
+    let token_authorization = token_response_body["token"]
         .as_str()
         .unwrap();
-    assert!(!token.is_empty());
+    assert!(!token_authorization.is_empty(), "Token is empty");
 
     // Part 3: Patch Profile
     let patch_request_body: Value = json!({
@@ -92,10 +98,13 @@ async fn test_integration() -> Result<(), Box<dyn Error>> {
         .uri(format!("http://{address}/profile"))
         .method(Method::PATCH)
         .header("Content-Type", "application/json")
-        .header("Authorization", format!("Bearer {token}"))
+        .header("Authorization", format!("Bearer {token_authorization}"))
         .body(Body::from(patch_request_body.to_string()))?;
 
     let patch_response = client.request(patch_request).await?;
+    let patch_response_headers = patch_response.headers();
+    println!("Patch Response Headers: {patch_response_headers:#?}");
+
     let patch_response_bytes = to_bytes(patch_response.into_body()).await?;
 
     let patch_response_body: Value = from_slice(&patch_response_bytes)?;
@@ -104,7 +113,7 @@ async fn test_integration() -> Result<(), Box<dyn Error>> {
     let patch_response_country = patch_response_body["profile"]["name"]
         .as_str()
         .unwrap();
-    assert_eq!(patch_response_country, "Updated");
+    assert_eq!(patch_response_country, "Updated", "Patch request failed");
 
     Ok(())
 }

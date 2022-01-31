@@ -6,11 +6,11 @@
     clippy::must_use_candidate,
     clippy::unused_async
 )]
-#![feature(once_cell, map_first_last)]
-#![forbid(unsafe_code)]
+#![feature(once_cell, map_first_last, type_alias_impl_trait, core_intrinsics)]
 
 use axum::AddExtensionLayer;
 use axum::Router;
+use axum_extra::middleware::from_fn;
 use sqlx::migrate;
 use tracing::debug;
 
@@ -22,8 +22,9 @@ use crate::core::database;
 use crate::core::database::DatabasePool;
 use crate::core::logging;
 use crate::core::{cache, secrets};
-use crate::errors::internal::ServerError;
-use crate::handlers::{healthcheck, profile, register, token};
+use crate::errors::core::ServerError;
+use crate::handlers::{healthcheck, profile, register, token, version};
+use crate::middleware::version_header;
 use crate::repositories::profile::ProfileRepository;
 use crate::secrets::Secrets;
 use crate::services::password::PasswordService;
@@ -34,10 +35,13 @@ pub mod core;
 pub mod errors;
 pub mod extractors;
 pub mod handlers;
+pub mod middleware;
 pub mod models;
 pub mod repositories;
 pub mod services;
 pub mod validation;
+
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub async fn build_app() -> Result<Router, ServerError> {
     logging::init()?;
@@ -68,15 +72,20 @@ pub async fn build_app() -> Result<Router, ServerError> {
     let password_service = PasswordService::new();
     let profile_service = ProfileService::new(password_service.clone(), profile_repository);
 
+    // Global Middleware
+    let version_header_middleware = from_fn(version_header::version_header_middleware);
+
     // App
     let app = Router::new()
         .merge(healthcheck::routes())
         .merge(register::routes())
         .merge(token::routes())
         .merge(profile::routes())
+        .merge(version::routes())
         .layer(AddExtensionLayer::new(token_service))
         .layer(AddExtensionLayer::new(password_service))
-        .layer(AddExtensionLayer::new(profile_service));
+        .layer(AddExtensionLayer::new(profile_service))
+        .layer(version_header_middleware);
 
     Ok(app)
 }

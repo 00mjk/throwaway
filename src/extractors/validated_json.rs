@@ -8,7 +8,7 @@ use http_body::Body;
 use serde::de::DeserializeOwned;
 use validator::Validate;
 
-use crate::errors::internal::ServerError;
+use crate::errors::core::ServerError;
 
 #[derive(Debug, Clone, Copy, Default)]
 pub struct ValidatedJson<T>(pub T);

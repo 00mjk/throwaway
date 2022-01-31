@@ -4,7 +4,7 @@ use uuid::Uuid;
 pub const ISS: &str = "throwaway";
 
 /// <https://www.iana.org/assignments/jwt/jwt.xhtml#claims>
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Claims {
     // Issuer
     pub iss: String,

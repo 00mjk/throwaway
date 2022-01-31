@@ -4,7 +4,7 @@ use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 use tracing::{error, info};
 
 use crate::config::Config;
-use crate::errors::internal::ServerError;
+use crate::errors::core::ServerError;
 use crate::models::secrets::database::DatabaseSecrets;
 
 pub type DatabasePool = Pool<Postgres>;

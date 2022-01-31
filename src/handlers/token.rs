@@ -1,36 +1,30 @@
 use axum::extract::Extension;
 use axum::http::StatusCode;
+use axum::response::IntoResponse;
 use axum::routing::post;
 use axum::{Json, Router};
-use tracing::info;
+use tower::layer::layer_fn;
 
-use crate::errors::internal::ServerError;
-use crate::errors::token::TokenError;
-use crate::models::request::token::TokenRequest;
+use crate::errors::core::ServerError;
+use crate::middleware::basic_authentication::BasicAuthentication;
+use crate::models::database::profile::Profile;
 use crate::models::response::token::TokenResponse;
-use crate::{ProfileService, TokenService};
+use crate::TokenService;
 
 pub fn routes() -> Router {
-    Router::new().route("/token", post(token_post))
+    Router::new()
+        .route("/token", post(token_post))
+        .route_layer(layer_fn(|inner| {
+            BasicAuthentication {
+                inner,
+            }
+        }))
 }
 
 pub async fn token_post(
-    Json(token_request): Json<TokenRequest>,
-    Extension(profile_service): Extension<ProfileService>,
     Extension(token_service): Extension<TokenService>,
-) -> Result<(StatusCode, Json<TokenResponse>), ServerError> {
-    info!("Token POST: {token_request:?}");
-
-    // FIXME: Can we move this to a extractor
-    // Verify email and password are valid.
-    let (valid_credentials, profile) = profile_service
-        .verify_credentials(token_request.email, token_request.password)
-        .await?;
-
-    if !valid_credentials {
-        return Err(TokenError::InvalidToken.into());
-    }
-
+    Extension(profile): Extension<Profile>,
+) -> Result<impl IntoResponse, ServerError> {
     // Generate token
     let token = token_service.generate(profile.profile_id)?;
     let token_response = TokenResponse {

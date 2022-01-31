@@ -2,7 +2,7 @@ use chrono::{Duration, Utc};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use uuid::Uuid;
 
-use crate::errors::internal::ServerError;
+use crate::errors::core::ServerError;
 use crate::models::claims::{Claims, ISS};
 use crate::models::secrets::jwt::JwtSecrets;
 

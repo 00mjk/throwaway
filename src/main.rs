@@ -6,15 +6,14 @@
     clippy::must_use_candidate,
     clippy::unused_async
 )]
-#![feature(once_cell, map_first_last)]
-#![forbid(unsafe_code)]
+#![feature(once_cell, map_first_last, type_alias_impl_trait, core_intrinsics)]
 
 use std::error::Error;
 use std::net::SocketAddr;
 
 use hyper::Server;
 use throwaway::build_app;
-use throwaway::errors::internal::ServerError;
+use throwaway::errors::core::ServerError;
 use tracing::info;
 
 #[tokio::main]

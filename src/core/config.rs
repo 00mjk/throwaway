@@ -2,7 +2,7 @@ use dotenv::dotenv;
 use envconfig::Envconfig;
 use tracing::error;
 
-use crate::errors::internal::ServerError;
+use crate::errors::core::ServerError;
 
 #[derive(Envconfig, Clone, Debug)]
 pub struct Config {

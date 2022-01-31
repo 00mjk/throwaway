@@ -5,7 +5,7 @@ use tracing_subscriber::filter::FromEnvError;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::{EnvFilter, Registry};
 
-use crate::errors::internal::ServerError;
+use crate::errors::core::ServerError;
 
 #[allow(clippy::cognitive_complexity)]
 pub fn init() -> Result<(), ServerError> {

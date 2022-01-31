@@ -15,6 +15,7 @@ pub struct Secrets {
     pub jwt: JwtSecrets,
 }
 
+/// FIXME: Support reading Vault token from filepath (K8s injection method)
 pub async fn read(config: &Config) -> Result<Secrets, ServerError> {
     let settings = VaultClientSettingsBuilder::default()
         .address(&config.vault_url)

@@ -3,7 +3,7 @@ use tracing::error;
 use tracing::instrument;
 
 use crate::database::DatabasePool;
-use crate::errors::internal::ServerError;
+use crate::errors::core::ServerError;
 use crate::errors::profile::ProfileError;
 use crate::models::database::profile::Profile;
 use crate::models::request::register::RegisterRequest;

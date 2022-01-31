@@ -1,6 +1,6 @@
 use sqlx::types::Uuid;
 
-use crate::errors::internal::ServerError;
+use crate::errors::core::ServerError;
 use crate::errors::profile::ProfileError;
 use crate::models::database::profile::Profile;
 use crate::models::request::register::RegisterRequest;
@@ -46,6 +46,7 @@ impl ProfileService {
         Ok(profile_id)
     }
 
+    // FIXME: Read vs Get?
     pub async fn read(&self, profile_id: Uuid) -> Result<Profile, ServerError> {
         let profile = self
             .profile_repository
@@ -91,15 +92,15 @@ impl ProfileService {
         Ok(profile)
     }
 
-    pub async fn verify_credentials(&self, email: String, password: String) -> Result<(bool, Profile), ServerError> {
+    pub async fn verify_credentials(&self, email: &str, password: &str) -> Result<(bool, Profile), ServerError> {
         let profile = self
             .profile_repository
-            .get_by_email(&email)
+            .get_by_email(email)
             .await?;
 
         let valid = self
             .password_service
-            .verify(&password, &profile.password)
+            .verify(password, &profile.password)
             .await?;
 
         Ok((valid, profile))

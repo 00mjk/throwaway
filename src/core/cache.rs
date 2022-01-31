@@ -6,7 +6,7 @@ use redis::{AsyncCommands, FromRedisValue, RedisResult, ToRedisArgs};
 use tracing::info;
 
 use crate::config::Config;
-use crate::errors::internal::ServerError;
+use crate::errors::core::ServerError;
 use crate::models::secrets::cache::CacheSecrets;
 
 pub type CachePool = Pool;
