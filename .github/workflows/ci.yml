@@ -47,8 +47,13 @@ jobs:
       - name: Cache Cargo
         uses: Swatinem/rust-cache@v1
 
+      - name: Install cargo-make
+        uses: baptiste0928/cargo-install@v1
+        with:
+          crate: cargo-make
+
       - name: Run linters
-        run: ./scripts/lint.sh
+        run: cargo make lint-ci
 
   unit:
     name: Unit Tests
@@ -66,8 +71,13 @@ jobs:
       - name: Cache Cargo
         uses: Swatinem/rust-cache@v1
 
+      - name: Install cargo-make
+        uses: baptiste0928/cargo-install@v1
+        with:
+          crate: cargo-make
+
       - name: Run unit tests
-        run: cargo unit
+        run: cargo make unit
 
   integration:
     name: Integration Tests
@@ -91,8 +101,13 @@ jobs:
       - name: Cache Cargo
         uses: Swatinem/rust-cache@v1
 
+      - name: Install cargo-make
+        uses: baptiste0928/cargo-install@v1
+        with:
+          crate: cargo-make
+
       - name: Create cluster
         uses: ./.github/actions/throwaway-cluster
 
       - name: Run integration tests
-        run: cargo integration
+        run: cargo make integration

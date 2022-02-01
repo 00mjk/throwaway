@@ -3,10 +3,10 @@
 
 # Project
 !.cargo
-!docker
 !src
 !sql
 !Cargo.lock
 !Cargo.toml
+!Makefile.toml
 !README.md
 !sqlx-data.json

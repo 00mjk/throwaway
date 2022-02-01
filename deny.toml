@@ -1,0 +1,24 @@
+[advisories]
+vulnerability = "deny"
+unmaintained = "deny"
+notice = "deny"
+unsound = "deny"
+
+[bans]
+multiple-versions = "deny"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+
+[licenses]
+unlicensed = "deny"
+allow-osi-fsf-free = "neither"
+copyleft = "deny"
+confidence-threshold = 0.8
+allow = [
+  "Apache-2.0",
+  "Apache-2.0 WITH LLVM-exception",
+  "MIT",
+  "MPL-2.0"
+]

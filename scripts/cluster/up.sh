@@ -8,6 +8,7 @@ if ! (k3d cluster list | grep -q throwaway); then
   k3d cluster create throwaway \
     --api-port 127.0.0.1:6443 \
     --k3s-arg "--no-deploy=traefik@server:*" \
+    --registry-create throwaway-registry \
     --port "80:80@loadbalancer" \
     --port "433:433@loadbalancer" \
     --port "5432:5432@loadbalancer" \
@@ -47,7 +48,7 @@ until curl --silent --head --fail --output /dev/null http://vault.127.0.0.1.nip.
   sleep 3
 done
 
-# FIXME: Really not a fan of this...
+# FIXME: Really not a fan of this, maybe a submodule if the correct approach?
 echo "Provisioning Vault"
 if [ "$(uname)" == "Darwin" ]; then
   pushd "${HOME}/workspace/throwaway-terraform/environment/dev"

@@ -7,11 +7,10 @@ RUN apk add --update \
     ca-certificates \
     libc-dev \
     openssl-dev \
-    protoc \
     curl \
     jq
 
-RUN cargo install cargo-watch
+RUN cargo install cargo-make
 
 WORKDIR app
 
@@ -19,14 +18,13 @@ COPY Cargo.toml .
 COPY Cargo.lock .
 RUN cargo fetch
 
-ADD docker /opt/docker
 HEALTHCHECK \
   --interval="60s" \
   --timeout="6s" \
   --retries="6" \
-  CMD ["/opt/docker/healthcheck.sh"]
+  CMD curl --silent "http://0.0.0.0:8000/health"
 
 COPY . .
 
-ENTRYPOINT ["/bin/sh"]
-CMD ["/opt/docker/command.sh"]
+ENTRYPOINT ["cargo"]
+CMD ["run"]

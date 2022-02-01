@@ -1,0 +1,51 @@
+[tasks.unit]
+command = "cargo"
+args = ["test", "--lib", "--bins", "--", "--nocapture"]
+
+[tasks.integration]
+command = "cargo"
+args = ["test", "--test", "*", "--", "--nocapture"]
+
+[tasks.test]
+dependencies = ["unit", "integration"]
+
+[tasks.check]
+command = "cargo"
+args = ["check"]
+
+[tasks.fmt]
+command = "cargo"
+args = ["fmt", "--all"]
+
+[tasks.fmt-ci]
+command = "cargo"
+args = ["fmt", "--all", "--check"]
+
+[tasks.clippy]
+command = "cargo"
+args = ["clippy", "--all", "--tests"]
+
+[tasks.lint]
+dependencies = ["check", "fmt", "clippy"]
+
+[tasks.lint-ci]
+dependencies = ["check", "fmt-ci", "clippy"]
+
+[tasks.audit]
+install_crate = "cargo-audit"
+command = "cargo"
+args = ["audit"]
+
+[tasks.deny]
+install_crate = "cargo-deny"
+command = "cargo"
+args = ["deny", "check", "--all-features"]
+
+[tasks.security]
+dependencies = ["audit", "deny"]
+
+[tasks.sql]
+install_crate = "sqlx-cli"
+env = { "DATABASE_URL" = "postgresql://postgres:password@localhost:5432/postgres"}
+command = "cargo"
+args = ["sqlx", "prepare", "--", "--lib"]

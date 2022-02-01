@@ -20,7 +20,7 @@ pub struct Profile {
     pub is_deleted: bool,
 }
 
-/// FIXME: Perhaps better ot support .into() style access? How do we do that, use From<T> ?
+// FIXME: Perhaps better ot support .into() style access? How do we do that, use From<T> ?
 impl Profile {
     pub fn to_public(&self) -> ProfilePublic {
         ProfilePublic {

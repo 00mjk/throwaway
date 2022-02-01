@@ -177,27 +177,6 @@
       ]
     }
   },
-  "7e58fc725f2a55bc59cbd19a81ffd30295ffcba38135d79214f7fda5d645cae9": {
-    "query": "\n            SELECT EXISTS(\n              SELECT 1\n              FROM information_schema.tables\n              WHERE table_schema = $1 AND table_name = $2\n            )\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "exists",
-          "type_info": "Bool"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Text",
-          "Text"
-        ]
-      },
-      "nullable": [
-        null
-      ]
-    }
-  },
   "aac04e444601555d3543ba016ade0fa6b69b200aad65a0a184f0f8fce1b68d7b": {
     "query": "\n            SELECT EXISTS(\n                SELECT 1\n                FROM throwaway.profile\n                WHERE email = $1\n            )\n            ",
     "describe": {
