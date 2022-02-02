@@ -1,0 +1,14 @@
+[advisories]
+ignore = [
+  # FIXME: Potential segfault in `localtime_r` invocations
+  "RUSTSEC-2020-0159",
+
+  # FIXME: Potential segfault in the time crate
+  "RUSTSEC-2020-0071",
+
+  # FIXME: Data race when sending and receiving after closing a `oneshot` channel
+  "RUSTSEC-2021-0124",
+
+  # FIXME: `net2` crate has been deprecated; use `socket2` instead
+  "RUSTSEC-2020-0016",
+]

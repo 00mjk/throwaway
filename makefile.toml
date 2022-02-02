@@ -7,7 +7,10 @@ command = "cargo"
 args = ["test", "--test", "*", "--", "--nocapture"]
 
 [tasks.test]
-dependencies = ["unit", "integration"]
+dependencies = [
+  "unit",
+  "integration"
+]
 
 [tasks.check]
 command = "cargo"
@@ -26,10 +29,18 @@ command = "cargo"
 args = ["clippy", "--all", "--tests"]
 
 [tasks.lint]
-dependencies = ["check", "fmt", "clippy"]
+dependencies = [
+  "check",
+  "fmt",
+  "clippy"
+]
 
 [tasks.lint-ci]
-dependencies = ["check", "fmt-ci", "clippy"]
+dependencies = [
+  "check",
+  "fmt-ci",
+  "clippy"
+]
 
 [tasks.audit]
 install_crate = "cargo-audit"
@@ -39,10 +50,13 @@ args = ["audit"]
 [tasks.deny]
 install_crate = "cargo-deny"
 command = "cargo"
-args = ["deny", "check", "--all-features"]
+args = ["deny", "check"]
 
 [tasks.security]
-dependencies = ["audit", "deny"]
+dependencies = [
+  "audit",
+  "deny"
+]
 
 [tasks.sql]
 install_crate = "sqlx-cli"
