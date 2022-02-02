@@ -7,6 +7,7 @@ if ! (k3d cluster list | grep -q throwaway); then
   # FIXME: Look into caching strategies for K3d images - https://github.com/rancher/k3d/issues/906
   k3d cluster create throwaway \
     --api-port 127.0.0.1:6443 \
+    --image "rancher/k3s:v1.23.1-k3s2" \
     --k3s-arg "--no-deploy=traefik@server:*" \
     --registry-create throwaway-registry \
     --port "80:80@loadbalancer" \
@@ -29,19 +30,22 @@ echo "Configuring Git source"
 flux create source git throwaway \
   --url https://github.com/CathalMullan/throwaway-flux \
   --branch master \
-  --interval 3m
+  --timeout 5m \
+  --interval 5m
 
 echo "Applying Flux manifests"
 flux create kustomization throwaway \
   --source GitRepository/throwaway \
   --path "clusters/dev" \
   --prune true \
-  --interval 10m
-
-flux reconcile kustomization throwaway --with-source
+  --timeout 5m \
+  --interval 5m
 
 echo "Waiting for Flux to reconcile"
-kubectl --namespace flux-system wait kustomization/flux-system --for=condition=ready --timeout=5m
+flux reconcile kustomization throwaway --with-source --timeout 5m
+
+echo "Waiting for Flux System to be ready"
+kubectl --namespace flux-system wait kustomization/flux-system --for=condition=ready --timeout 5m
 
 echo "Waiting for Vault to come up"
 until curl --silent --head --fail --output /dev/null http://vault.127.0.0.1.nip.io/v1/sys/health; do

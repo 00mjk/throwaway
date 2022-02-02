@@ -9,8 +9,12 @@ args = ["test", "--test", "*", "--", "--nocapture"]
 [tasks.test]
 dependencies = [
   "unit",
-  "integration"
+  "integration",
 ]
+
+[tasks.build]
+command = "cargo"
+args = ["build"]
 
 [tasks.check]
 command = "cargo"
@@ -32,14 +36,14 @@ args = ["clippy", "--all", "--tests"]
 dependencies = [
   "check",
   "fmt",
-  "clippy"
+  "clippy",
 ]
 
 [tasks.lint-ci]
 dependencies = [
   "check",
   "fmt-ci",
-  "clippy"
+  "clippy",
 ]
 
 [tasks.audit]
@@ -55,7 +59,15 @@ args = ["deny", "check"]
 [tasks.security]
 dependencies = [
   "audit",
-  "deny"
+  "deny",
+]
+
+[tasks.ci]
+dependencies = [
+  "build",
+  "lint-ci",
+  "security",
+  "test",
 ]
 
 [tasks.sql]

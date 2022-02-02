@@ -13,11 +13,38 @@ runs:
     - name: Download K3d
       shell: bash
       run: curl --silent --fail https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
+      env:
+        TAG: "v5.2.2"
+
+    - name: Print K3d version
+      shell: bash
+      run: k3d --version
 
     - name: Download Flux
       shell: bash
       run: curl --silent --fail https://fluxcd.io/install.sh | bash
+      env:
+        FLUX_VERSION: "0.25.3"
+
+    - name: Print Flux version
+      shell: bash
+      run: flux --version
 
     - name: Bring up cluster
       shell: bash
       run: ./scripts/cluster/up.sh
+
+    - name: Flux namespace resources
+      if: failure()
+      shell: bash
+      run: kubectl -n flux-system get all
+
+    - name: Flux system details
+      if: failure()
+      shell: bash
+      run: flux get all --all-namespaces
+
+    - name: Flux error logs
+      if: failure()
+      shell: bash
+      run: flux logs --all-namespaces --level error
