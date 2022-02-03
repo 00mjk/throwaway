@@ -19,7 +19,13 @@ git clone git@github.com:CathalMullan/throwaway-terraform.git ${HOME}/workspace/
 Cluster
 
 ```
-brew install kubectl k3d fluxcd/tap/flux terraform
+export TAG="v5.2.2"
+curl --silent --fail https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
+
+export FLUX_VERSION="0.25.3"
+curl --silent --fail https://fluxcd.io/install.sh | bash
+
+brew install kubectl terraform
 cd "${HOME}/workspace/throwaway"
 ./scripts/cluster/up.sh
 ```

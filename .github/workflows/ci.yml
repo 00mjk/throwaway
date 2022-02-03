@@ -8,7 +8,9 @@ on:
       - '**/*.rs'
 
 env:
-  RUST_VERSION: nightly
+  RUST_VERSION: "nightly"
+  RUST_LOG: "debug"
+  CARGO_INCREMENTAL: "true"
 
 jobs:
   build:

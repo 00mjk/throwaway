@@ -54,6 +54,7 @@ chrono = { version = "0.4", features = ["serde"] }
 
 # Errors
 thiserror = "1.0"
+anyhow = "1.0"
 
 # Encoding
 base64 = "0.13"

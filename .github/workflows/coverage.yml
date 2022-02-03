@@ -5,7 +5,9 @@ on:
   workflow_dispatch:
 
 env:
-  RUST_VERSION: nightly
+  RUST_VERSION: "nightly"
+  RUST_LOG: "debug"
+  CARGO_INCREMENTAL: "true"
 
 jobs:
   coverage:

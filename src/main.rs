@@ -8,16 +8,16 @@
 )]
 #![feature(once_cell, map_first_last, type_alias_impl_trait, core_intrinsics)]
 
-use std::error::Error;
 use std::net::SocketAddr;
 
+use anyhow::Error;
 use hyper::Server;
 use throwaway::build_app;
 use throwaway::errors::core::ServerError;
 use tracing::info;
 
 #[tokio::main]
-pub async fn main() -> Result<(), Box<dyn Error>> {
+pub async fn main() -> Result<(), Error> {
     let app = build_app().await?;
 
     let address = SocketAddr::from(([0, 0, 0, 0], 8000));

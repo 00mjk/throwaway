@@ -1,6 +1,6 @@
-use std::error::Error;
 use std::net::SocketAddr;
 
+use anyhow::Error;
 use axum::http::Request;
 use base64::encode;
 use hyper::client::HttpConnector;
@@ -33,7 +33,7 @@ impl Framework {
         format!("http://{address}{endpoint}")
     }
 
-    pub async fn create_profile(&self, profile: &CreateProfile) -> Result<APIResponse, Box<dyn Error>> {
+    pub async fn create_profile(&self, profile: &CreateProfile) -> Result<APIResponse, Error> {
         let body: String = to_string(&profile)?;
         debug!("Create Profile Request Body: {body:#?}");
 
@@ -48,7 +48,7 @@ impl Framework {
         Ok(result)
     }
 
-    pub async fn patch_profile(&self, token: &str, profile: &PatchProfile) -> Result<APIResponse, Box<dyn Error>> {
+    pub async fn patch_profile(&self, token: &str, profile: &PatchProfile) -> Result<APIResponse, Error> {
         let body: String = to_string(&profile)?;
         debug!("Patch Profile Request Body: {body:#?}");
 
@@ -64,7 +64,7 @@ impl Framework {
         Ok(result)
     }
 
-    pub async fn request_token(&self, email: &str, password: &str) -> Result<APIResponse, Box<dyn Error>> {
+    pub async fn request_token(&self, email: &str, password: &str) -> Result<APIResponse, Error> {
         let encoded_authorization = encode(format!("{email}:{password}"));
         let basic_authorization = format!("Basic {encoded_authorization}");
         debug!("Request Token Request Headers: {basic_authorization:#?}");

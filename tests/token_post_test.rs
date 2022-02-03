@@ -1,5 +1,4 @@
 use anyhow::Error;
-
 mod common;
 
 use common::models::profile::profile_create::CreateProfile;
@@ -8,7 +7,7 @@ use common::models::profile::profile_patch::PatchProfile;
 use crate::common::framework::Framework;
 
 #[tokio::test]
-async fn profile_patch_valid() -> Result<(), Error> {
+async fn token_post_valid() -> Result<(), Error> {
     let framework = Framework::new().await;
 
     // Register
@@ -26,23 +25,7 @@ async fn profile_patch_valid() -> Result<(), Error> {
         .as_str()
         .unwrap();
 
-    // Patch Profile
-    let profile_patch = PatchProfile {
-        name: Some("Updated".to_string()),
-        email: None,
-        country: None,
-        timezone: None,
-    };
-
-    let patch_response = framework
-        .patch_profile(token_authorization, &profile_patch)
-        .await?;
-
-    let patch_response_country = patch_response.body["profile"]["name"]
-        .as_str()
-        .unwrap();
-
-    assert_eq!(patch_response_country, "Updated");
+    assert!(!token_authorization.is_empty());
 
     Ok(())
 }

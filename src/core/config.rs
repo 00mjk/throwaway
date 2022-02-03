@@ -6,11 +6,6 @@ use crate::errors::core::ServerError;
 
 #[derive(Envconfig, Clone, Debug)]
 pub struct Config {
-    #[envconfig(from = "APP_VERSION")]
-    pub app_version: String,
-    #[envconfig(from = "APP_LOG_LEVEL")]
-    pub app_log_level: String,
-
     #[envconfig(from = "USE_LOCAL", default = "false")]
     pub use_local: bool,
 
