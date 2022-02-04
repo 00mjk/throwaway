@@ -8,7 +8,7 @@ use common::models::profile::profile_patch::PatchProfile;
 use crate::common::framework::Framework;
 
 #[tokio::test]
-async fn profile_patch_valid() -> Result<(), Error> {
+async fn profile_patch_name_valid() -> Result<(), Error> {
     let framework = Framework::new().await;
 
     // Register

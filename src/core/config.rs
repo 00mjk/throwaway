@@ -1,10 +1,11 @@
 use dotenv::dotenv;
 use envconfig::Envconfig;
+use serde::Serialize;
 use tracing::error;
 
 use crate::errors::core::ServerError;
 
-#[derive(Envconfig, Clone, Debug)]
+#[derive(Envconfig, Clone, Debug, Serialize)]
 pub struct Config {
     #[envconfig(from = "USE_LOCAL", default = "false")]
     pub use_local: bool,

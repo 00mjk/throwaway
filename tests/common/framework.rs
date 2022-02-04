@@ -80,4 +80,28 @@ impl Framework {
         let result = APIResponse::new(response).await;
         Ok(result)
     }
+
+    pub async fn get_version(&self) -> Result<APIResponse, Error> {
+        let request = Request::builder()
+            .uri(self.endpoint("/version"))
+            .method(Method::GET)
+            .header("Content-Type", "application/json")
+            .body(Body::empty())?;
+
+        let response = self.client.request(request).await?;
+        let result = APIResponse::new(response).await;
+        Ok(result)
+    }
+
+    pub async fn get_config(&self) -> Result<APIResponse, Error> {
+        let request = Request::builder()
+            .uri(self.endpoint("/config"))
+            .method(Method::GET)
+            .header("Content-Type", "application/json")
+            .body(Body::empty())?;
+
+        let response = self.client.request(request).await?;
+        let result = APIResponse::new(response).await;
+        Ok(result)
+    }
 }

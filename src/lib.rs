@@ -23,7 +23,6 @@ use crate::core::database::DatabasePool;
 use crate::core::logging;
 use crate::core::{cache, secrets};
 use crate::errors::core::ServerError;
-use crate::handlers::{healthcheck, profile, register, token, version};
 use crate::middleware::version_header;
 use crate::repositories::profile::ProfileRepository;
 use crate::secrets::Secrets;
@@ -77,14 +76,16 @@ pub async fn build_app() -> Result<Router, ServerError> {
 
     // App
     let app = Router::new()
-        .merge(healthcheck::routes())
-        .merge(register::routes())
-        .merge(token::routes())
-        .merge(profile::routes())
-        .merge(version::routes())
+        .merge(handlers::config::routes())
+        .merge(handlers::register::routes())
+        .merge(handlers::token::routes())
+        .merge(handlers::profile::routes())
+        .merge(handlers::version::routes())
         .layer(AddExtensionLayer::new(token_service))
         .layer(AddExtensionLayer::new(password_service))
         .layer(AddExtensionLayer::new(profile_service))
+        .layer(AddExtensionLayer::new(config))
+        .layer(AddExtensionLayer::new(secrets))
         .layer(version_header_middleware);
 
     Ok(app)

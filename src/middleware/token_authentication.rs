@@ -10,19 +10,28 @@ use tracing::{debug, info};
 
 use crate::{ProfileService, TokenService};
 
-#[derive(Clone)]
-pub struct TokenAuthentication<S> {
-    pub inner: S,
+#[derive(Debug, Clone)]
+pub struct TokenAuthenticationLayer;
+
+impl Default for TokenAuthenticationLayer {
+    fn default() -> Self {
+        Self
+    }
 }
 
-impl<S> Layer<S> for TokenAuthentication<S> {
-    type Service = Self;
+impl<S> Layer<S> for TokenAuthenticationLayer {
+    type Service = TokenAuthentication<S>;
 
     fn layer(&self, inner: S) -> Self::Service {
-        Self {
+        TokenAuthentication {
             inner,
         }
     }
+}
+
+#[derive(Debug, Clone)]
+pub struct TokenAuthentication<S> {
+    inner: S,
 }
 
 impl<S> Service<Request<Body>> for TokenAuthentication<S>
@@ -34,12 +43,10 @@ where
     type Future = BoxFuture<'static, Result<Self::Response, Self::Error>>;
     type Response = S::Response;
 
-    #[inline]
     fn poll_ready(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
         self.inner.poll_ready(cx)
     }
 
-    #[inline]
     fn call(&mut self, request: Request<Body>) -> Self::Future {
         let clone = self.inner.clone();
         let mut inner = std::mem::replace(&mut self.inner, clone);

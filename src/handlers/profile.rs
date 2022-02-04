@@ -3,12 +3,11 @@ use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::routing::patch;
 use axum::{Json, Router};
-use tower::layer::layer_fn;
 use tracing::instrument;
 
 use crate::errors::core::ServerError;
 use crate::extractors::validated_json::ValidatedJson;
-use crate::middleware::token_authentication::TokenAuthentication;
+use crate::middleware::token_authentication::TokenAuthenticationLayer;
 use crate::models::database::profile::Profile;
 use crate::models::request::profile::ProfilePatchRequest;
 use crate::models::response::profile::ProfilePatchResponse;
@@ -17,11 +16,7 @@ use crate::services::profile::ProfileService;
 pub fn routes() -> Router {
     Router::new()
         .route("/profile", patch(profile_patch))
-        .route_layer(layer_fn(|inner| {
-            TokenAuthentication {
-                inner,
-            }
-        }))
+        .route_layer(TokenAuthenticationLayer::default())
 }
 
 // TODO: How does PATCH work with passwords and redacted fields?

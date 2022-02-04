@@ -8,7 +8,7 @@ use crate::models::secrets::database::DatabaseSecrets;
 use crate::models::secrets::jwt::JwtSecrets;
 use crate::ServerError;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Secrets {
     pub cache: CacheSecrets,
     pub database: DatabaseSecrets,
