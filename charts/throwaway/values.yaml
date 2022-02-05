@@ -3,9 +3,17 @@ image: "throwaway"
 env:
   VAULT_URL: "http://vault.vault.svc.cluster.local:8200"
   VAULT_TOKEN: "root"
+
   VAULT_KV_MOUNT: "throwaway-kv-v2"
-  VAULT_PATH_REDIS: "redis"
-  VAULT_PATH_POSTGRESQL: "postgresql"
-  VAULT_PATH_JWT: "jwt"
+  VAULT_KV_PATH_REDIS: "redis"
+  VAULT_KV_PATH_JWT: "jwt"
+
+  VAULT_DATABASE_MOUNT: "throwaway-database"
+  VAULT_DATABASE_DEPLOYMENT_ROLE: "throwaway-deployment"
+  VAULT_DATABASE_ROLE: "throwaway"
+
+  DATABASE_HOST: "postgresql.postgresql.svc.cluster.local"
+  DATABASE_PORT: "5432"
+  DATABASE_DB: "postgres"
   DATABASE_CONNECTIONS: "100"
   DATABASE_LIFETIME: "3600"

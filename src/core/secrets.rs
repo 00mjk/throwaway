@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use vaultrs::client::{VaultClient, VaultClientSettingsBuilder};
+use vaultrs::database::role::creds;
 use vaultrs::kv2;
 
 use crate::config::Config;
@@ -12,6 +13,7 @@ use crate::ServerError;
 pub struct Secrets {
     pub cache: CacheSecrets,
     pub database: DatabaseSecrets,
+    pub database_deployment: DatabaseSecrets,
     pub jwt: JwtSecrets,
 }
 
@@ -25,16 +27,37 @@ pub async fn read(config: &Config) -> Result<Secrets, ServerError> {
 
     let client = VaultClient::new(settings).map_err(ServerError::VaultClientError)?;
 
-    let cache_secrets: CacheSecrets = kv2::read(&client, &config.vault_kv_mount, &config.vault_path_redis).await?;
+    let cache_secrets: CacheSecrets = kv2::read(&client, &config.vault_kv_mount, &config.vault_kv_path_redis).await?;
 
-    let database_secrets: DatabaseSecrets =
-        kv2::read(&client, &config.vault_kv_mount, &config.vault_path_postgresql).await?;
+    let database_deployment_credentials = creds(
+        &client,
+        &config.vault_database_mount,
+        &config.vault_database_deployment_role,
+    )
+    .await?;
+    let database_deployment_secrets = DatabaseSecrets {
+        host: config.database_host.clone(),
+        port: config.database_port.clone(),
+        db: config.database_db.clone(),
+        user: database_deployment_credentials.username,
+        password: database_deployment_credentials.password,
+    };
 
-    let jwt_secrets: JwtSecrets = kv2::read(&client, &config.vault_kv_mount, &config.vault_path_jwt).await?;
+    let database_credentials = creds(&client, &config.vault_database_mount, &config.vault_database_role).await?;
+    let database_secrets = DatabaseSecrets {
+        host: config.database_host.clone(),
+        port: config.database_port.clone(),
+        db: config.database_db.clone(),
+        user: database_credentials.username,
+        password: database_credentials.password,
+    };
+
+    let jwt_secrets: JwtSecrets = kv2::read(&client, &config.vault_kv_mount, &config.vault_kv_path_jwt).await?;
 
     Ok(Secrets {
         cache: cache_secrets,
         database: database_secrets,
+        database_deployment: database_deployment_secrets,
         jwt: jwt_secrets,
     })
 }

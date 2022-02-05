@@ -14,6 +14,7 @@ local_resource(
     }
 )
 
+# FIXME: Distroless, Rootless, see https://github.com/tilt-dev/tilt-extensions/pull/97
 docker_build_with_restart(
     ref='throwaway',
     context='.',

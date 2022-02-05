@@ -55,13 +55,14 @@ pub async fn build_app() -> Result<Router, ServerError> {
 
     // Connection Pools
     let database: DatabasePool = database::connect(&config, &secrets.database).await?;
+    let database_deployment: DatabasePool = database::connect(&config, &secrets.database_deployment).await?;
 
     let cache_pool: CachePool = cache::connect(&config, &secrets.cache)?;
     let cache: Cache = cache::Cache::new(cache_pool);
 
     // Database Provision
     migrate!("sql/migrations")
-        .run(&database)
+        .run(&database_deployment)
         .await
         .map_err(ServerError::SqlxMigrationError)?;
 

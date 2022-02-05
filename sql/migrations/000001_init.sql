@@ -2,6 +2,7 @@
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+-- NOTE: This schema is created by Vault as well
 CREATE SCHEMA IF NOT EXISTS throwaway;
 
 DROP TABLE IF EXISTS throwaway.profile CASCADE;
