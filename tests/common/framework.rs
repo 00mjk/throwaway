@@ -72,8 +72,34 @@ impl Framework {
         let request = Request::builder()
             .uri(self.endpoint("/token"))
             .method(Method::POST)
-            .header("Authorization", basic_authorization)
             .header("Content-Type", "application/json")
+            .header("Authorization", basic_authorization)
+            .body(Body::empty())?;
+
+        let response = self.client.request(request).await?;
+        let result = APIResponse::new(response).await;
+        Ok(result)
+    }
+
+    pub async fn token_test(&self, token: &str) -> Result<APIResponse, Error> {
+        let request = Request::builder()
+            .uri(self.endpoint("/token/test"))
+            .method(Method::GET)
+            .header("Content-Type", "application/json")
+            .header("Authorization", format!("Bearer {token}"))
+            .body(Body::empty())?;
+
+        let response = self.client.request(request).await?;
+        let result = APIResponse::new(response).await;
+        Ok(result)
+    }
+
+    pub async fn token_info(&self, token: &str) -> Result<APIResponse, Error> {
+        let request = Request::builder()
+            .uri(self.endpoint("/token/info"))
+            .method(Method::GET)
+            .header("Content-Type", "application/json")
+            .header("Authorization", format!("Bearer {token}"))
             .body(Body::empty())?;
 
         let response = self.client.request(request).await?;

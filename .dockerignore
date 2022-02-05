@@ -3,10 +3,13 @@
 
 # Project
 !.cargo
-!src
 !sql
+!src
 !Cargo.lock
 !Cargo.toml
 !Makefile.toml
 !README.md
 !sqlx-data.json
+
+# Dev Builds
+!target/aarch64-unknown-linux-gnu/debug

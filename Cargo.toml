@@ -34,12 +34,12 @@ axum = { version = "0.4", features = ["headers"] }
 axum-extra = "0.1"
 hyper = "0.14"
 tower = { version = "0.4", features = ["tokio-util"] }
-tower-http = "0.2"
+tower-http = { version = "0.2", features = ["cors", "trace", "sensitive-headers", "decompression-full", "compression-full", "set-header"] }
 http-body = "0.4"
 headers = "0.3"
 
 # Cache
-redis = { version = "0.21", features = ["tokio-comp", "tokio-native-tls-comp"] }
+redis = { version = "0.21", features = ["tokio-comp"] }
 deadpool-redis = { version = "0.10", features = ["serde"] }
 
 # Config

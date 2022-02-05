@@ -16,7 +16,7 @@ async fn config_get_valid() -> Result<(), Error> {
         .as_bool()
         .unwrap();
 
-    assert_eq!(use_local_string, true);
+    assert!(use_local_string);
 
     Ok(())
 }

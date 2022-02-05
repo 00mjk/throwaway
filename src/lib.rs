@@ -8,10 +8,12 @@
 )]
 #![feature(once_cell, map_first_last, type_alias_impl_trait, core_intrinsics)]
 
-use axum::AddExtensionLayer;
-use axum::Router;
+use axum::http::header;
+use axum::{AddExtensionLayer, Router};
 use axum_extra::middleware::from_fn;
 use sqlx::migrate;
+use tower::ServiceBuilder;
+use tower_http::ServiceBuilderExt;
 use tracing::debug;
 
 use crate::cache::Cache;
@@ -72,10 +74,16 @@ pub async fn build_app() -> Result<Router, ServerError> {
     let profile_service = ProfileService::new(password_service.clone(), profile_repository);
 
     // Global Middleware
-    let version_header_middleware = from_fn(version_header::version_header_middleware);
+    let version_header = from_fn(version_header::version_header_middleware);
+    let sensitive_headers = vec![header::AUTHORIZATION, header::COOKIE];
+
+    let middleware = ServiceBuilder::new()
+        .sensitive_headers(sensitive_headers)
+        .layer(version_header);
 
     // App
     let app = Router::new()
+        .layer(middleware)
         .merge(handlers::config::routes())
         .merge(handlers::register::routes())
         .merge(handlers::token::routes())
@@ -85,8 +93,7 @@ pub async fn build_app() -> Result<Router, ServerError> {
         .layer(AddExtensionLayer::new(password_service))
         .layer(AddExtensionLayer::new(profile_service))
         .layer(AddExtensionLayer::new(config))
-        .layer(AddExtensionLayer::new(secrets))
-        .layer(version_header_middleware);
+        .layer(AddExtensionLayer::new(secrets));
 
     Ok(app)
 }

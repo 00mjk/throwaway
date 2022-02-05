@@ -43,6 +43,12 @@ cargo run
 API (Cluster)
 
 ```
+brew tap messense/macos-cross-toolchains
+brew install aarch64-unknown-linux-gnu
+
+rustup target add aarch64-unknown-linux-gnu
+cargo build --target aarch64-unknown-linux-gnu
+
 brew install tilt
 tilt up --stream=true
 ```
