@@ -12,10 +12,10 @@ async fn version_get_valid() -> Result<(), Error> {
 
     // Lookup version
     let version_response = framework.get_version().await?;
+
     let version_string = version_response.body["version"]
         .as_str()
         .unwrap();
-
     assert!(!version_string.is_empty());
 
     Ok(())

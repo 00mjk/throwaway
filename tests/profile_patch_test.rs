@@ -1,4 +1,5 @@
 use anyhow::Error;
+use serde_json::json;
 
 mod common;
 
@@ -18,8 +19,17 @@ async fn profile_patch_name_valid() -> Result<(), Error> {
         .await?;
 
     // Fetch Token
+    let token_request_body = json!({
+        "lifespan": 60,
+        "attributes": {
+            "profile": {
+                "update": true
+            }
+        }
+    });
+
     let token_response = framework
-        .request_token(&profile.email, &profile.password)
+        .request_token(&profile.email, &profile.password, token_request_body)
         .await?;
 
     let token_authorization = token_response.body["token"]

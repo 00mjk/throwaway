@@ -71,6 +71,10 @@ pub enum ServerError {
 
     #[error("Token: {0}")]
     TokenError(#[from] crate::errors::token::TokenError),
+
+    /// FIXME: This should only be used short term, and replaced with proper error handling in time
+    #[error("WIP Error")]
+    WIPError,
 }
 
 impl IntoResponse for ServerError {

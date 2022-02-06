@@ -1,7 +1,8 @@
-use chrono::{Duration, Utc};
+use chrono::{DateTime, Duration, Utc};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use uuid::Uuid;
 
+use crate::attributes::core::Attributes;
 use crate::errors::core::ServerError;
 use crate::models::claims::{Claims, ISS};
 use crate::models::secrets::jwt::JwtSecrets;
@@ -18,16 +19,21 @@ impl TokenService {
         }
     }
 
-    pub fn generate(&self, profile_id: Uuid) -> Result<String, ServerError> {
+    pub fn generate(
+        &self,
+        profile_id: Uuid,
+        lifespan: Duration,
+        attributes: Option<Attributes>,
+    ) -> Result<String, ServerError> {
         let now = Utc::now();
-        let duration = Duration::minutes(15);
-        let expiration = now + duration;
+        let expiration: DateTime<Utc> = now + lifespan;
 
         let claims = Claims {
             iss: ISS.to_string(),
             exp: expiration.timestamp(),
             iat: now.timestamp(),
             sub: profile_id,
+            attributes,
         };
 
         let encoding_key = EncodingKey::from_secret(self.jwt_password.as_bytes());

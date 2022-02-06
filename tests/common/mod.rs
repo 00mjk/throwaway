@@ -5,7 +5,8 @@
     clippy::missing_errors_doc,
     clippy::multiple_crate_versions,
     clippy::must_use_candidate,
-    clippy::unused_async
+    clippy::unused_async,
+    clippy::struct_excessive_bools
 )]
 
 pub mod framework;

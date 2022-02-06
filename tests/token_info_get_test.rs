@@ -1,4 +1,6 @@
 use anyhow::Error;
+use serde_json::json;
+
 mod common;
 
 use common::models::profile::profile_create::CreateProfile;
@@ -17,8 +19,17 @@ async fn token_info_get_valid() -> Result<(), Error> {
         .await?;
 
     // Fetch Token
+    let token_request_body = json!({
+        "lifespan": 60,
+        "attributes": {
+            "profile": {
+                "update": true
+            }
+        }
+    });
+
     let token_response = framework
-        .request_token(&profile.email, &profile.password)
+        .request_token(&profile.email, &profile.password, token_request_body)
         .await?;
 
     let token_authorization = token_response.body["token"]
@@ -33,8 +44,12 @@ async fn token_info_get_valid() -> Result<(), Error> {
     let token_info_issued_at = token_info_response.body["issued_at"]
         .as_str()
         .unwrap();
-
     assert!(!token_info_issued_at.is_empty());
+
+    let token_info_attributes_profile_update = token_info_response.body["attributes"]["profile"]["update"]
+        .as_bool()
+        .unwrap();
+    assert!(token_info_attributes_profile_update);
 
     Ok(())
 }

@@ -6,7 +6,7 @@ use base64::encode;
 use hyper::client::HttpConnector;
 use hyper::Client;
 use hyper::{Body, Method};
-use serde_json::to_string;
+use serde_json::{to_string, Value};
 use tracing::log::debug;
 
 use crate::common::models::response::APIResponse;
@@ -64,17 +64,25 @@ impl Framework {
         Ok(result)
     }
 
-    pub async fn request_token(&self, email: &str, password: &str) -> Result<APIResponse, Error> {
+    pub async fn request_token(
+        &self,
+        email: &str,
+        password: &str,
+        token_request_body: Value,
+    ) -> Result<APIResponse, Error> {
         let encoded_authorization = encode(format!("{email}:{password}"));
         let basic_authorization = format!("Basic {encoded_authorization}");
-        debug!("Request Token Request Headers: {basic_authorization:#?}");
+        debug!("Token Request Headers: {basic_authorization:#?}");
+
+        let body: String = token_request_body.to_string();
+        debug!("Token Request Body: {body:#?}");
 
         let request = Request::builder()
             .uri(self.endpoint("/token"))
             .method(Method::POST)
             .header("Content-Type", "application/json")
             .header("Authorization", basic_authorization)
-            .body(Body::empty())?;
+            .body(Body::from(body))?;
 
         let response = self.client.request(request).await?;
         let result = APIResponse::new(response).await;

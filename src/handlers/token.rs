@@ -3,13 +3,15 @@ use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Json, Router};
-use chrono::{TimeZone, Utc};
+use chrono::{Duration, TimeZone, Utc};
 
 use crate::errors::core::ServerError;
+use crate::extractors::validated_json::ValidatedJson;
 use crate::middleware::basic_authentication::BasicAuthenticationLayer;
 use crate::middleware::token_authentication::TokenAuthenticationLayer;
 use crate::models::claims::Claims;
 use crate::models::database::profile::Profile;
+use crate::models::request::token::TokenRequest;
 use crate::models::response::token::TokenResponse;
 use crate::models::response::token_info::TokenInfoResponse;
 use crate::TokenService;
@@ -30,10 +32,13 @@ pub fn routes() -> Router {
 }
 
 pub async fn token_post(
+    ValidatedJson(token_request): ValidatedJson<TokenRequest>,
     Extension(token_service): Extension<TokenService>,
     Extension(profile): Extension<Profile>,
 ) -> Result<impl IntoResponse, ServerError> {
-    let token = token_service.generate(profile.profile_id)?;
+    let lifespan_duration = Duration::seconds(token_request.lifespan as i64);
+    let token = token_service.generate(profile.profile_id, lifespan_duration, token_request.attributes)?;
+
     let token_response = TokenResponse {
         token,
     };
@@ -46,12 +51,14 @@ pub async fn token_test_get() -> Result<impl IntoResponse, ServerError> {
 }
 
 pub async fn token_info_get(Extension(claims): Extension<Claims>) -> Result<impl IntoResponse, ServerError> {
-    let issued_at = Utc.timestamp(claims.iat, 0);
-    let expires_at = Utc.timestamp(claims.exp, 0);
-
     let token_info_response = TokenInfoResponse {
-        issued_at: issued_at.to_rfc3339(),
-        expires_at: expires_at.to_rfc3339(),
+        issued_at: Utc
+            .timestamp(claims.iat, 0)
+            .to_rfc3339(),
+        expires_at: Utc
+            .timestamp(claims.exp, 0)
+            .to_rfc3339(),
+        attributes: claims.attributes,
     };
 
     Ok((StatusCode::CREATED, Json(token_info_response)))

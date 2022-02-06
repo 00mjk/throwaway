@@ -4,9 +4,10 @@
     clippy::missing_errors_doc,
     clippy::multiple_crate_versions,
     clippy::must_use_candidate,
-    clippy::unused_async
+    clippy::unused_async,
+    clippy::struct_excessive_bools
 )]
-#![feature(once_cell, map_first_last, type_alias_impl_trait, core_intrinsics)]
+#![feature(const_mut_refs, once_cell, map_first_last, type_alias_impl_trait, core_intrinsics)]
 
 use axum::http::header;
 use axum::{AddExtensionLayer, Router};
@@ -32,10 +33,12 @@ use crate::services::password::PasswordService;
 use crate::services::profile::ProfileService;
 use crate::services::token::TokenService;
 
+pub mod attributes;
 pub mod core;
 pub mod errors;
 pub mod extractors;
 pub mod handlers;
+pub mod helpers;
 pub mod middleware;
 pub mod models;
 pub mod repositories;

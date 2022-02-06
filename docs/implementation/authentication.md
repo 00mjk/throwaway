@@ -27,6 +27,14 @@ TOKEN=$(curl \
   --request POST \
   --header 'Content-Type: application/json' \
   --header "Authorization: Basic ${BASIC}" \
+  --data-raw '{
+    "lifespan": 600,
+    "attributes": {
+      "profile": {
+        "create": true
+      }
+    }
+  }' \
   http://localhost:8000/token | jq -r .token)
 
 echo "Token: ${TOKEN}"

@@ -4,9 +4,10 @@
     clippy::missing_errors_doc,
     clippy::multiple_crate_versions,
     clippy::must_use_candidate,
-    clippy::unused_async
+    clippy::unused_async,
+    clippy::struct_excessive_bools
 )]
-#![feature(once_cell, map_first_last, type_alias_impl_trait, core_intrinsics)]
+#![feature(const_mut_refs, once_cell, map_first_last, type_alias_impl_trait, core_intrinsics)]
 
 use std::net::SocketAddr;
 
