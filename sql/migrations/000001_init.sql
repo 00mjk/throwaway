@@ -1,11 +1,8 @@
--- DELETE FROM _sqlx_migrations;
-
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- NOTE: This schema is created by Vault as well
 CREATE SCHEMA IF NOT EXISTS throwaway;
 
-DROP TABLE IF EXISTS throwaway.profile CASCADE;
 CREATE TABLE IF NOT EXISTS throwaway.profile
 (
   profile_id UUID        NOT NULL DEFAULT gen_random_uuid(),
