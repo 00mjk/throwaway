@@ -12,7 +12,6 @@
 use axum::http::header;
 use axum::{AddExtensionLayer, Router};
 use axum_extra::middleware::from_fn;
-use sqlx::migrate;
 use tower::ServiceBuilder;
 use tower_http::ServiceBuilderExt;
 use tracing::debug;
@@ -24,6 +23,7 @@ use crate::core::config;
 use crate::core::database;
 use crate::core::database::DatabasePool;
 use crate::core::logging;
+use crate::core::migrations::migrate;
 use crate::core::{cache, secrets};
 use crate::errors::core::ServerError;
 use crate::middleware::version_header;
@@ -64,10 +64,7 @@ pub async fn build_app() -> Result<Router, ServerError> {
     let cache: Cache = cache::Cache::new(cache_pool);
 
     // Database Provision
-    migrate!("sql/migrations")
-        .run(&database_deployment)
-        .await
-        .map_err(ServerError::SqlxMigrationError)?;
+    migrate(&database_deployment).await?;
 
     // Repositories
     let profile_repository = ProfileRepository::new(database.clone(), cache.clone());

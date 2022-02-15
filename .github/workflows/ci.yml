@@ -29,8 +29,13 @@ jobs:
       - name: Cache Cargo
         uses: Swatinem/rust-cache@v1
 
+      - name: Install cargo-make
+        uses: baptiste0928/cargo-install@v1
+        with:
+          crate: cargo-make
+
       - name: Build package
-        run: cargo build
+        run: cargo make build
 
   lint:
     name: Lint
@@ -78,6 +83,12 @@ jobs:
         with:
           crate: cargo-make
 
+      - name: Install cargo-nextest
+        uses: baptiste0928/cargo-install@v1
+        with:
+          crate: cargo-nextest
+          version: "0.9"
+
       - name: Run unit tests
         run: cargo make unit
 
@@ -107,6 +118,12 @@ jobs:
         uses: baptiste0928/cargo-install@v1
         with:
           crate: cargo-make
+
+      - name: Install cargo-nextest
+        uses: baptiste0928/cargo-install@v1
+        with:
+          crate: cargo-nextest
+          version: "0.9"
 
       - name: Create cluster
         uses: ./.github/actions/throwaway-cluster

@@ -37,6 +37,12 @@ jobs:
         with:
           crate: cargo-make
 
+      - name: Install cargo-nextest
+        uses: baptiste0928/cargo-install@v1
+        with:
+          crate: cargo-nextest
+          version: "0.9"
+
       - name: Create cluster
         uses: ./.github/actions/throwaway-cluster
 

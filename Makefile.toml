@@ -1,10 +1,29 @@
+# Dependencies
+
+## NOTE: Ensure you keep in sync with the CI version
+[tasks.cargo-nextest]
+install_crate = { crate_name = "cargo-nextest", version = "0.9" }
+
+[tasks.cargo-audit]
+install_crate = { crate_name = "cargo-audit" }
+
+[tasks.cargo-deny]
+install_crate = { crate_name = "cargo-deny" }
+
+## NOTE: Ensure you keep in sync with `sqlx` crate version
+[tasks.sqlx-cli]
+install_crate = { crate_name = "sqlx-cli", version = "0.5" }
+
+# Tasks
 [tasks.unit]
 command = "cargo"
-args = ["test", "--lib", "--bins", "--", "--nocapture"]
+args = ["nextest", "run", "--lib", "--bins"]
+dependencies = ["cargo-nextest"]
 
 [tasks.integration]
 command = "cargo"
-args = ["test", "--test", "*", "--", "--nocapture"]
+args = ["nextest", "run", "--test", "*"]
+dependencies = ["cargo-nextest", "sql-migrate"]
 
 [tasks.test]
 dependencies = [
@@ -46,20 +65,45 @@ dependencies = [
   "clippy",
 ]
 
+[tasks.sql-migrate]
+command = "cargo"
+args = ["run", "--bin", "throwaway-migrate"]
+
+[tasks.sql-prepare]
+env = { "DATABASE_URL" = "postgresql://postgres:password@localhost:5432/postgres"}
+command = "cargo"
+args = ["sqlx", "prepare", "--", "--lib"]
+dependencies = ["sqlx-cli"]
+
+[tasks.sql]
+dependencies = [
+  "sql-migrate",
+  "sql-prepare",
+]
+
 [tasks.audit]
-install_crate = "cargo-audit"
 command = "cargo"
 args = ["audit"]
+dependencies = ["cargo-audit"]
 
 [tasks.deny]
-install_crate = "cargo-deny"
 command = "cargo"
 args = ["deny", "check"]
+dependencies = ["cargo-deny"]
 
 [tasks.security]
 dependencies = [
   "audit",
   "deny",
+]
+
+[tasks.verify]
+dependencies = [
+  "sql",
+  "build",
+  "lint",
+  "security",
+  "test",
 ]
 
 [tasks.ci]
@@ -69,9 +113,3 @@ dependencies = [
   "security",
   "test",
 ]
-
-[tasks.sql]
-install_crate = "sqlx-cli"
-env = { "DATABASE_URL" = "postgresql://postgres:password@localhost:5432/postgres"}
-command = "cargo"
-args = ["sqlx", "prepare", "--", "--lib"]

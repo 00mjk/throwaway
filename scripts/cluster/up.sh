@@ -49,19 +49,12 @@ kubectl --namespace flux-system wait kustomization/flux-system --for=condition=r
 
 echo "Waiting for Vault to come up"
 until curl --silent --head --fail --output /dev/null http://vault.127.0.0.1.nip.io/v1/sys/health; do
-  sleep 3
+  sleep 1
 done
-
-# NOTE: Connecting too early can result in the query hanging, hence this check and wait first
-echo "Waiting for Database port to open"
-until nc -z localhost 5432; do
-  sleep 3
-done
-sleep 10
 
 echo "Waiting for Database to come up"
-until psql "host=localhost port=5432 dbname=postgres user=postgres password=password" -c "SELECT 1"; do
-  sleep 3
+until pg_isready --quiet --host localhost --port 5432; do
+  sleep 1
 done
 
 # FIXME: Really not a fan of this, maybe a submodule if the correct approach?
@@ -74,4 +67,5 @@ fi
 
 terraform init -upgrade
 terraform apply -auto-approve
+
 popd

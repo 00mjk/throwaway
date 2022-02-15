@@ -19,7 +19,11 @@ path = "src/lib.rs"
 
 [[bin]]
 name = "throwaway"
-path = "src/main.rs"
+path = "src/bin/api.rs"
+
+[[bin]]
+name = "throwaway-migrate"
+path = "src/bin/migrate.rs"
 
 [dependencies]
 # Async

@@ -5,7 +5,7 @@ use throwaway::build_app;
 pub async fn start_test_server() -> SocketAddr {
     let app = build_app().await.unwrap();
 
-    let socket_address = SocketAddr::from(([127, 0, 0, 1], 8000));
+    let socket_address = SocketAddr::from(([127, 0, 0, 1], 0));
     let listener = TcpListener::bind(socket_address).unwrap();
 
     let address = listener.local_addr().unwrap();

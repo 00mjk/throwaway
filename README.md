@@ -12,8 +12,9 @@ A **mock** payments processing system.
 Repositories
 
 ```
-git clone git@github.com:CathalMullan/throwaway.git ${HOME}/workspace/throwaway
-git clone git@github.com:CathalMullan/throwaway-terraform.git ${HOME}/workspace/throwaway-terraform
+git clone git@github.com:CathalMullan/throwaway.git "${HOME}/workspace/throwaway"
+git clone git@github.com:CathalMullan/throwaway-flux.git "${HOME}/workspace/throwaway-flux"
+git clone git@github.com:CathalMullan/throwaway-terraform.git "${HOME}/workspace/throwaway-terraform"
 ```
 
 Cluster
@@ -28,6 +29,12 @@ curl --silent --fail https://fluxcd.io/install.sh | bash
 brew install kubectl terraform
 cd "${HOME}/workspace/throwaway"
 ./scripts/cluster/up.sh
+```
+
+Verify Setup
+
+```
+cargo make verify
 ```
 
 API (Local)
