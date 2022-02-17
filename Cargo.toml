@@ -27,7 +27,7 @@ path = "src/bin/migrate.rs"
 
 [dependencies]
 # Async
-tokio = { version = "1.16", features = ["full", "tracing"] }
+tokio = { version = "1.17", features = ["full", "tracing"] }
 futures = "0.3"
 
 # Authentication
