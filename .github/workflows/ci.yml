@@ -3,9 +3,8 @@ name: CI
 
 on:
   workflow_dispatch:
+  pull_request:
   push:
-    paths:
-      - '**/*.rs'
 
 env:
   RUST_VERSION: "nightly"
