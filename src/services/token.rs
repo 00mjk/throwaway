@@ -1,5 +1,5 @@
 use chrono::{DateTime, Duration, Utc};
-use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
+use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use uuid::Uuid;
 
 use crate::attributes::core::Attributes;
@@ -37,16 +37,14 @@ impl TokenService {
         };
 
         let encoding_key = EncodingKey::from_secret(self.jwt_password.as_bytes());
-        let token = encode(&Header::default(), &claims, &encoding_key);
+        let token = encode(&Header::new(Algorithm::HS512), &claims, &encoding_key);
 
         token.map_err(ServerError::JwtError)
     }
 
     pub fn decode(&self, token: &str) -> Result<Claims, ServerError> {
-        let validation = Validation {
-            iss: Some(ISS.to_string()),
-            ..Validation::default()
-        };
+        let mut validation = Validation::new(Algorithm::HS512);
+        validation.set_issuer(&[ISS]);
 
         let decoding_key = DecodingKey::from_secret(self.jwt_password.as_bytes());
         let token_data = decode::<Claims>(token, &decoding_key, &validation);
