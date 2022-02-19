@@ -23,7 +23,7 @@ Cluster
 export TAG="v5.2.2"
 curl --silent --fail https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
 
-export FLUX_VERSION="0.25.3"
+export FLUX_VERSION="0.27.0"
 curl --silent --fail https://fluxcd.io/install.sh | bash
 
 brew install kubectl terraform
