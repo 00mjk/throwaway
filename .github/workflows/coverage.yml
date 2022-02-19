@@ -58,7 +58,7 @@ jobs:
           mv tarpaulin-report.html build/index.html
 
       - name: Deploy coverage report
-        uses: JamesIves/github-pages-deploy-action@v4.2.2
+        uses: JamesIves/github-pages-deploy-action@v4.2.5
         with:
           branch: coverage-pages
           folder: build
