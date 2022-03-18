@@ -10,5 +10,8 @@
 target
 *.rs.bk
 
+# Nix
+result
+
 # Tilt Extensions
 tilt_modules

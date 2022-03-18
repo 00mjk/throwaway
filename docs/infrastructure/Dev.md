@@ -47,3 +47,5 @@ Should JWT use a key instead? (via Vault PKI)
 Database transactions to prevent half-created hierarchies
 
 How to detect required token refresh?
+
+Should we essentially build an SDK to help with testing?

@@ -8,6 +8,7 @@ use crate::errors::core::ServerError;
 use crate::models::response::config::ConfigResponse;
 use crate::Config;
 
+#[must_use]
 pub fn routes() -> Router {
     Router::new().route("/config", get(config_get))
 }

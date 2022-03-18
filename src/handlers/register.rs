@@ -10,6 +10,7 @@ use crate::models::request::register::RegisterRequest;
 use crate::models::response::register::RegisterResponse;
 use crate::services::profile::ProfileService;
 
+#[must_use]
 pub fn routes() -> Router {
     Router::new().route("/register", post(register_post))
 }

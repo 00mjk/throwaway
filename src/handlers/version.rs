@@ -7,6 +7,7 @@ use crate::errors::core::ServerError;
 use crate::models::response::version::VersionResponse;
 use crate::VERSION;
 
+#[must_use]
 pub fn routes() -> Router {
     Router::new().route("/version", get(version_get))
 }

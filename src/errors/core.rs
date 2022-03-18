@@ -9,6 +9,7 @@ use tracing::error;
 
 #[derive(Error, Debug)]
 pub enum ServerError {
+    // Can we include status code here? `#[error("[Validation]: {0}", StatusCode::BAD_REQUEST)]`
     #[error("[Validation]: {0}")]
     ValidationError(#[from] validator::ValidationErrors),
 

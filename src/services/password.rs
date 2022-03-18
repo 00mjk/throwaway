@@ -10,6 +10,7 @@ pub struct PasswordService {
 }
 
 impl PasswordService {
+    #[must_use]
     pub fn new() -> Self {
         Self {
             argon2: Argon2::default(),

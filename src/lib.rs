@@ -9,8 +9,9 @@
 )]
 #![feature(const_mut_refs, once_cell, map_first_last, type_alias_impl_trait, core_intrinsics)]
 
+use axum::extract::Extension;
 use axum::http::header;
-use axum::{AddExtensionLayer, Router};
+use axum::Router;
 use axum_extra::middleware::from_fn;
 use tower::ServiceBuilder;
 use tower_http::ServiceBuilderExt;
@@ -90,11 +91,11 @@ pub async fn build_app() -> Result<Router, ServerError> {
         .merge(handlers::token::routes())
         .merge(handlers::profile::routes())
         .merge(handlers::version::routes())
-        .layer(AddExtensionLayer::new(token_service))
-        .layer(AddExtensionLayer::new(password_service))
-        .layer(AddExtensionLayer::new(profile_service))
-        .layer(AddExtensionLayer::new(config))
-        .layer(AddExtensionLayer::new(secrets));
+        .layer(Extension(token_service))
+        .layer(Extension(password_service))
+        .layer(Extension(profile_service))
+        .layer(Extension(config))
+        .layer(Extension(secrets));
 
     Ok(app)
 }

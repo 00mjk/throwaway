@@ -17,6 +17,7 @@ pub struct ProfileRepository {
 
 // FIXME: I wonder if splitting this into SQL v Cache repos (?) would be nicer?
 impl ProfileRepository {
+    #[must_use]
     pub const fn new(database: DatabasePool, cache: Cache) -> Self {
         Self {
             database,

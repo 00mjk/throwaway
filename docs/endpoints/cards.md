@@ -1,2 +1,0 @@
-# `/cards`
-Customer cards

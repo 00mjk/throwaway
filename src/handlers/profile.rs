@@ -13,6 +13,7 @@ use crate::models::request::profile::ProfilePatchRequest;
 use crate::models::response::profile::ProfilePatchResponse;
 use crate::services::profile::ProfileService;
 
+#[must_use]
 pub fn routes() -> Router {
     Router::new()
         .route("/profile", patch(profile_patch))
@@ -118,6 +119,7 @@ pub async fn profile_patch(
         _ => {
             // This could be a scenario when a user tries to patch multiple fields (or no fields).
             // TODO: Can we validate patches at the extractor level? Ensure validated json with only 1 field set e.g.
+            // TODO: Can we just return an Err here?
             let response = ProfilePatchResponse {
                 message: "Invalid request".to_string(),
                 code: 422,

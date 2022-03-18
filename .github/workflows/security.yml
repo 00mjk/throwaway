@@ -2,7 +2,7 @@
 name: Security
 
 env:
-  RUST_VERSION: "nightly"
+  RUST_VERSION: "nightly-2022-03-10"
   RUST_LOG: "debug"
   CARGO_INCREMENTAL: "true"
 

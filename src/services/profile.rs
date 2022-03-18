@@ -14,6 +14,7 @@ pub struct ProfileService {
 }
 
 impl ProfileService {
+    #[must_use]
     pub const fn new(password_service: PasswordService, profile_repository: ProfileRepository) -> Self {
         Self {
             password_service,

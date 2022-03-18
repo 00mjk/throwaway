@@ -13,6 +13,7 @@ pub struct TokenService {
 }
 
 impl TokenService {
+    #[must_use]
     pub fn new(jwt_secrets: &JwtSecrets) -> Self {
         Self {
             jwt_password: jwt_secrets.password.clone(),

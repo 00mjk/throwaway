@@ -205,3 +205,8 @@ Create database schema first (and nail relationships)
 Should database tables and API routes be plural?
 
 Do we allow one 'account' to manage multiple businesses?
+
+## Type-state Auth Usage?
+Could we have 2 types here for authorized / unauthorized?
+
+E.g. `Profile<Authorized>` vs `Profile<Unauthorized>`

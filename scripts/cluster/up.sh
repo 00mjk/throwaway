@@ -9,7 +9,7 @@ if ! (k3d cluster list | grep -q throwaway); then
     --api-port 127.0.0.1:6443 \
     --image "rancher/k3s:v1.23.1-k3s2" \
     --k3s-arg "--no-deploy=traefik@server:*" \
-    --registry-create throwaway-registry \
+    --registry-create k3d-throwaway-registry \
     --port "80:80@loadbalancer" \
     --port "433:433@loadbalancer" \
     --port "5432:5432@loadbalancer" \

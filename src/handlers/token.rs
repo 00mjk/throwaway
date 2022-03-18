@@ -16,6 +16,7 @@ use crate::models::response::token::TokenResponse;
 use crate::models::response::token_info::TokenInfoResponse;
 use crate::TokenService;
 
+#[must_use]
 pub fn routes() -> Router {
     let basic_auth_routes = Router::new()
         .route("/token", post(token_post))

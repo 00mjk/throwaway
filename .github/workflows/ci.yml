@@ -9,7 +9,7 @@ on:
       - master
 
 env:
-  RUST_VERSION: "nightly"
+  RUST_VERSION: "nightly-2022-03-10"
   RUST_LOG: "debug"
   CARGO_INCREMENTAL: "true"
 
@@ -30,13 +30,8 @@ jobs:
       - name: Cache Cargo
         uses: Swatinem/rust-cache@v1
 
-      - name: Install cargo-make
-        uses: baptiste0928/cargo-install@v1
-        with:
-          crate: cargo-make
-
       - name: Build package
-        run: cargo make build
+        run: ./scripts/compile.sh
 
   lint:
     name: Lint
@@ -55,13 +50,8 @@ jobs:
       - name: Cache Cargo
         uses: Swatinem/rust-cache@v1
 
-      - name: Install cargo-make
-        uses: baptiste0928/cargo-install@v1
-        with:
-          crate: cargo-make
-
       - name: Run linters
-        run: cargo make lint-ci
+        run: ./scripts/fmt-ci.sh && ./scripts/lint.sh
 
   unit:
     name: Unit Tests
@@ -79,11 +69,6 @@ jobs:
       - name: Cache Cargo
         uses: Swatinem/rust-cache@v1
 
-      - name: Install cargo-make
-        uses: baptiste0928/cargo-install@v1
-        with:
-          crate: cargo-make
-
       - name: Install cargo-nextest
         uses: baptiste0928/cargo-install@v1
         with:
@@ -91,7 +76,7 @@ jobs:
           version: "0.9"
 
       - name: Run unit tests
-        run: cargo make unit
+        run: ./scripts/test/unit.sh
 
   integration:
     name: Integration Tests
@@ -115,10 +100,11 @@ jobs:
       - name: Cache Cargo
         uses: Swatinem/rust-cache@v1
 
-      - name: Install cargo-make
+      - name: Install sqlx-cli
         uses: baptiste0928/cargo-install@v1
         with:
-          crate: cargo-make
+          crate: sqlx-cli
+          version: "0.5.11"
 
       - name: Install cargo-nextest
         uses: baptiste0928/cargo-install@v1
@@ -129,5 +115,10 @@ jobs:
       - name: Create cluster
         uses: ./.github/actions/throwaway-cluster
 
+      - name: Provision DB
+        run: ./scripts/sql/migrate.sh
+        env:
+          DATABASE_URL: "postgresql://postgres:password@localhost:5432/postgres"
+
       - name: Run integration tests
-        run: cargo make integration
+        run: ./scripts/test/integration.sh

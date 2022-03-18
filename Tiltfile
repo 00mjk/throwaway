@@ -7,11 +7,8 @@ default_registry(
 
 local_resource(
     'rust-compile',
-    'cargo build --target=aarch64-unknown-linux-gnu',
+    'cargo zigbuild --target aarch64-unknown-linux-gnu',
     deps=['./src/', 'Cargo.lock', 'Cargo.toml'],
-    env={
-        "CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER": "aarch64-unknown-linux-gnu-gcc",
-    }
 )
 
 # FIXME: Distroless, Rootless, see https://github.com/tilt-dev/tilt-extensions/pull/97

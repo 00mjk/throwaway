@@ -37,6 +37,7 @@ pub struct Cache {
 }
 
 impl Cache {
+    #[must_use]
     pub const fn new(pool: CachePool) -> Self {
         Self {
             pool,
