@@ -8,7 +8,7 @@
 ## Install Nix
 
 ```
-sh <(curl -L https://nixos.org/nix/install)
+sh <(curl -L https://releases.nixos.org/nix/nix-2.7.0/install)
 ```
 
 ## Enable experimental features

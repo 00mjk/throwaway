@@ -62,8 +62,6 @@
         devShell = pkgs.mkShell {
           name = "throwaway-shell";
 
-          DATABASE_URL = "postgresql://postgres:password@localhost:5432/postgres";
-
           buildInputs = with pkgs; []
           ++ lib.optional stdenv.isDarwin [
             libiconv
