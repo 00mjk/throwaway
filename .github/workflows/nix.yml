@@ -3,17 +3,28 @@ name: Nix
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - '*.nix'
+  push:
+    branches:
+      - master
+    paths:
+      - '*.nix'
+
+defaults:
+  run:
+    shell: nix develop --verbose --command bash {0}
 
 jobs:
   nix-e2e:
     name: Nix E2E
-    strategy:
-      matrix:
-        os: ["ubuntu-latest", "macos-latest"]
-    runs-on: "${{ matrix.os }}"
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          submodules: true
 
       - name: Install Nix
         uses: cachix/install-nix-action@v16
@@ -23,20 +34,23 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
-      - name: Build package
-        run: nix develop --command ./scripts/compile.sh
+      - name: Build Nix shell
+        run: echo 'Nix shell built.'
 
       - name: Create cluster
-        uses: ./.github/actions/throwaway-cluster
-
-      - name: Provision DB
-        run: nix develop --command ./scripts/sql/migrate.sh
+        run: ./scripts/cluster/up.sh
 
       - name: Build package
-        run: nix develop --command ./scripts/compile.sh
+        run: ./scripts/compile.sh
+
+      - name: Provision DB
+        run: ./scripts/sql/migrate.sh
+
+      - name: Build package
+        run: ./scripts/compile.sh
 
       - name: Run unit tests
-        run: nix develop --command ./scripts/test/unit.sh
+        run: ./scripts/test/unit.sh
 
       - name: Run integration tests
-        run: nix develop --command ./scripts/test/integration.sh
+        run: ./scripts/test/integration.sh

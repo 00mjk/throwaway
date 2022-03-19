@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          submodules: true
 
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
@@ -39,6 +41,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          submodules: true
 
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
@@ -59,6 +63,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          submodules: true
 
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
@@ -84,12 +90,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: Checkout Terraform repository
-        uses: actions/checkout@v3
         with:
-          repository: CathalMullan/throwaway-terraform
-          path: throwaway-terraform
+          submodules: true
 
       - name: Setup Rust
         uses: actions-rs/toolchain@v1

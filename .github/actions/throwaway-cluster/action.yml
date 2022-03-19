@@ -6,7 +6,7 @@ runs:
   steps:
     - name: Download K3d
       shell: bash
-      run: curl --silent --fail https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
+      run: curl https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
       env:
         TAG: "v5.2.2"
 
@@ -16,7 +16,7 @@ runs:
 
     - name: Download Flux
       shell: bash
-      run: curl --silent --fail https://fluxcd.io/install.sh | bash
+      run: curl https://fluxcd.io/install.sh | bash
       env:
         FLUX_VERSION: "0.25.3"
 

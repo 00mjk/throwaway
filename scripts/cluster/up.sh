@@ -48,24 +48,21 @@ echo "Waiting for Flux System to be ready"
 kubectl --namespace flux-system wait kustomization/flux-system --for=condition=ready --timeout 5m
 
 echo "Waiting for Vault to come up"
+timeout --foreground 10m bash -c "
 until curl --silent --head --fail --output /dev/null http://vault.127.0.0.1.nip.io/v1/sys/health; do
   sleep 1
 done
+"
 
 echo "Waiting for Database to come up"
+timeout --foreground 10m bash -c "
 until pg_isready --quiet --host localhost --port 5432; do
   sleep 1
 done
+"
 
-# FIXME: Really not a fan of this, maybe a submodule if the correct approach?
 echo "Provisioning Vault"
-if [ "$(uname)" == "Darwin" ]; then
-  pushd "${HOME}/workspace/throwaway-terraform/environment/dev"
-else
-  pushd "/home/runner/work/throwaway/throwaway/throwaway-terraform/environment/dev"
-fi
-
+pushd throwaway-terraform/environment/dev
 terraform init -upgrade
 terraform apply -auto-approve
-
 popd

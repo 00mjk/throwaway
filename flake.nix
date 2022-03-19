@@ -8,6 +8,7 @@
 
     flake-utils = {
       url = "github:numtide/flake-utils";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     fenix = {
@@ -21,7 +22,8 @@
     };
 
     zig = {
-      url = "github:arqv/zig-overlay";
+      url = "github:roarkanize/zig-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -37,6 +39,11 @@
           inherit system overlays;
         };
 
+        inherit (pkgs) mkShell stdenv lib fetchFromGitHub;
+        inherit (pkgs.darwin.apple_sdk.frameworks) SystemConfiguration;
+
+        cargo-toml = (builtins.fromTOML (builtins.readFile ./Cargo.toml));
+
         toolchain = {
           channel = "nightly";
           date = "2022-03-10";
@@ -45,7 +52,11 @@
 
         rust-toolchain = with fenix.packages.${system}; combine (with toolchainOf toolchain; [
           cargo
+          clippy
           rustc
+          rustfmt
+          rust-src
+          rust-std
           (targets.aarch64-apple-darwin.toolchainOf toolchain).rust-std
           (targets.aarch64-unknown-linux-gnu.toolchainOf toolchain).rust-std
         ]);
@@ -55,17 +66,31 @@
           rustc = rust-toolchain;
         };
 
-        zig-master = zig.packages.${system}.master.latest;
+        zig-master = zig.packages.${system}."0.9.1";
+
+        sqlx-cli = pkgs.sqlx-cli.overrideAttrs (old: rec {
+          name = "sqlx-cli-${version}";
+          version = cargo-toml.dependencies.sqlx.version;
+
+          src = fetchFromGitHub {
+            owner = "launchbadge";
+            repo = "sqlx";
+            rev = "v${version}";
+            sha256 = "sha256-Tz7YzGkQUwH0U14dvsttP2GpnM9kign6L9PkAVs3dEc=";
+          };
+
+          cargoSha256 = "sha256-EKuRaVxwotgTPj95GJnrQGbulsFPClSettwS5f0TzoM=";
+        });
       in
       rec {
         # `nix develop`
-        devShell = pkgs.mkShell {
+        devShell = mkShell {
           name = "throwaway-shell";
 
           buildInputs = with pkgs; []
           ++ lib.optional stdenv.isDarwin [
             libiconv
-            darwin.apple_sdk.frameworks.SystemConfiguration
+            SystemConfiguration
           ];
 
           nativeBuildInputs = with pkgs; [
@@ -75,8 +100,9 @@
             # Rust Crates
             cargo-deny
             cargo-audit
+            sqlx-cli
+
             cargo-nextest
-            cargo-sqlx-cli
             cargo-zigbuild
 
             # Kubernetes

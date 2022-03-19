@@ -1,0 +1,6 @@
+[submodule "throwaway-flux"]
+	path = throwaway-flux
+	url = git@github.com:CathalMullan/throwaway-flux.git
+[submodule "throwaway-terraform"]
+	path = throwaway-terraform
+	url = git@github.com:CathalMullan/throwaway-terraform.git
