@@ -49,8 +49,6 @@ jobs:
 
       - name: Provision DB
         run: ./scripts/sql/migrate.sh
-        env:
-          DATABASE_URL: "postgresql://postgres:password@localhost:5432/postgres"
 
       - name: Run cargo tarpaulin
         uses: actions-rs/tarpaulin@v0.1

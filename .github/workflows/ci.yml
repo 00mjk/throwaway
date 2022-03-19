@@ -117,8 +117,6 @@ jobs:
 
       - name: Provision DB
         run: ./scripts/sql/migrate.sh
-        env:
-          DATABASE_URL: "postgresql://postgres:password@localhost:5432/postgres"
 
       - name: Run integration tests
         run: ./scripts/test/integration.sh
