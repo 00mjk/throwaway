@@ -76,7 +76,7 @@ tracing-log = "0.1"
 tracing-error = "0.2"
 
 # Secrets
-vaultrs = "0.5"
+vaultrs = "0.6"
 
 # Serialization
 serde = "1.0"
