@@ -42,8 +42,6 @@
         inherit (pkgs) mkShell stdenv lib fetchFromGitHub;
         inherit (pkgs.darwin.apple_sdk.frameworks) SystemConfiguration;
 
-        cargo-toml = (builtins.fromTOML (builtins.readFile ./Cargo.toml));
-
         toolchain = {
           channel = "nightly";
           date = "2022-03-10";
@@ -70,7 +68,7 @@
 
         sqlx-cli = pkgs.sqlx-cli.overrideAttrs (old: rec {
           name = "sqlx-cli-${version}";
-          version = cargo-toml.dependencies.sqlx.version;
+          version = "0.5.11";
 
           src = fetchFromGitHub {
             owner = "launchbadge";
@@ -87,7 +85,7 @@
         devShell = mkShell {
           name = "throwaway-shell";
 
-          buildInputs = with pkgs; []
+          buildInputs = with pkgs; [ pkgconfig openssl ]
           ++ lib.optional stdenv.isDarwin [
             libiconv
             SystemConfiguration
@@ -123,6 +121,10 @@
 
             # Nix
             nixpkgs-fmt
+          ]
+          ++ lib.optional stdenv.isLinux [
+            # Rust Crates
+            cargo-tarpaulin
           ];
         };
       });

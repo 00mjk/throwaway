@@ -1,0 +1,32 @@
+---
+name: CI Bootstrap
+description: Shared CI bootstrapping tasks
+
+inputs:
+  cachixToken:
+    description: Cachix Token
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Install Nix
+      uses: cachix/install-nix-action@v16
+      with:
+        install_url: https://releases.nixos.org/nix/nix-2.7.0/install
+        nix_path: nixpkgs=channel:nixos-unstable
+        extra_nix_config: |
+          experimental-features = nix-command flakes
+
+    - name: Cache Nix
+      uses: cachix/cachix-action@v10
+      with:
+        name: throwaway
+        authToken: "${{ inputs.cachixToken }}"
+
+    - name: Build Nix shell
+      shell: nix develop --verbose --command bash {0}
+      run: echo 'Nix shell built.'
+
+    - name: Cache Cargo
+      uses: Swatinem/rust-cache@v1

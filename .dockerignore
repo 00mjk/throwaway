@@ -11,5 +11,10 @@
 !README.md
 !sqlx-data.json
 
+# Nix
+!.nix
+!flake.nix
+!flake.lock
+
 # Dev Builds
 !target/aarch64-unknown-linux-gnu/debug

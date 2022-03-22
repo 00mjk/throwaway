@@ -4,10 +4,9 @@ name: Coverage
 on:
   workflow_dispatch:
 
-env:
-  RUST_VERSION: "nightly-2022-03-10"
-  RUST_LOG: "debug"
-  CARGO_INCREMENTAL: "true"
+defaults:
+  run:
+    shell: nix develop --verbose --command bash {0}
 
 jobs:
   coverage:
@@ -19,43 +18,19 @@ jobs:
         with:
           submodules: true
 
-      - name: Setup Rust
-        uses: actions-rs/toolchain@v1
+      - name: Bootstrap CI
+        uses: ./.github/actions/ci-bootstrap
         with:
-          profile: minimal
-          toolchain: "${{ env.RUST_VERSION }}"
-
-      - name: Cache Cargo
-        uses: Swatinem/rust-cache@v1
-
-      - name: Install sqlx-cli
-        uses: baptiste0928/cargo-install@v1
-        with:
-          crate: sqlx-cli
-          version: "0.5.11"
-
-      - name: Install cargo-nextest
-        uses: baptiste0928/cargo-install@v1
-        with:
-          crate: cargo-nextest
-          version: "0.9"
+          cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Create cluster
-        uses: ./.github/actions/throwaway-cluster
+        run: ./scripts/cluster/up.sh
 
       - name: Provision DB
         run: ./scripts/sql/migrate.sh
 
-      - name: Run cargo tarpaulin
-        uses: actions-rs/tarpaulin@v0.1
-        with:
-          version: '0.15.0'
-          out-type: Html
-
-      - name: Move coverage report
-        run: |
-          mkdir -p build
-          mv tarpaulin-report.html build/index.html
+      - name: Generate coverage
+        run: ./scripts/coverage.sh
 
       - name: Deploy coverage report
         uses: JamesIves/github-pages-deploy-action@v4.2.5

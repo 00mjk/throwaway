@@ -1,16 +1,15 @@
 ---
 name: Security
 
-env:
-  RUST_VERSION: "nightly-2022-03-10"
-  RUST_LOG: "debug"
-  CARGO_INCREMENTAL: "true"
-
 on:
   workflow_dispatch:
   schedule:
     # At 12:00 on Wednesday
     - cron: '0 12 * * 3'
+
+defaults:
+  run:
+    shell: nix develop --verbose --command bash {0}
 
 jobs:
   audit:
@@ -22,10 +21,13 @@ jobs:
         with:
           submodules: true
 
-      - name: Run Audit
-        uses: actions-rs/audit-check@v1
+      - name: Bootstrap CI
+        uses: ./.github/actions/ci-bootstrap
         with:
-          token: "${{ secrets.GITHUB_TOKEN }}"
+          cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+
+      - name: Run audit
+        run: ./scripts/security/audit.sh
 
   deny:
     name: Deny
@@ -36,7 +38,10 @@ jobs:
         with:
           submodules: true
 
-      - name: Run Deny
-        uses: EmbarkStudios/cargo-deny-action@v1
+      - name: Bootstrap CI
+        uses: ./.github/actions/ci-bootstrap
         with:
-          command: check
+          cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+
+      - name: Run deny
+        run: ./scripts/security/deny.sh

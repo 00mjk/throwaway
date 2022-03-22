@@ -15,6 +15,7 @@ local_resource(
 docker_build_with_restart(
     ref='throwaway',
     context='.',
+    dockerfile='tilt.Dockerfile',
     entrypoint=["throwaway"],
     only=[
         './target/aarch64-unknown-linux-gnu/debug/throwaway',
