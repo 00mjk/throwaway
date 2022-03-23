@@ -15,7 +15,7 @@ pub enum CredentialsError {
 impl IntoResponse for CredentialsError {
     fn into_response(self) -> Response {
         let status = match self {
-            CredentialsError::InvalidCredentials => (StatusCode::NOT_FOUND),
+            Self::InvalidCredentials => (StatusCode::NOT_FOUND),
         };
 
         let body = Json(json!({

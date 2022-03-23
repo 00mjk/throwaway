@@ -1,0 +1,64 @@
+---
+name: Nix
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "*.nix"
+  push:
+    branches:
+      - master
+    paths:
+      - "*.nix"
+
+jobs:
+  e2e:
+    name: E2E
+    strategy:
+      matrix:
+        system:
+          - { os: "ubuntu-latest",  shell: "nix develop --verbose --command bash {0}" }
+          - { os: "macos-latest",   shell: "nix develop --verbose --command bash {0}" }
+    runs-on: "${{ matrix.system.os }}"
+    defaults:
+      run:
+        shell: "${{ matrix.system.shell }}"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Setup Docker
+        if: matrix.system.os == 'macos-latest'
+        uses: docker-practice/actions-setup-docker@v1
+
+      - name: Bootstrap CI
+        uses: ./.github/actions/ci-bootstrap
+        with:
+          cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+
+      - name: Create cluster
+        run: ./scripts/cluster/up.sh
+
+      - name: Provision DB
+        run: ./scripts/sql/migrate.sh
+
+      - name: Run formatter
+        run: ./scripts/fmt-ci.sh
+
+      - name: Run linters
+        run: ./scripts/lint.sh
+
+      - name: Run unit tests
+        run: ./scripts/test/unit.sh
+
+      - name: Run audit
+        run: ./scripts/security/audit.sh
+
+      - name: Run deny
+        run: ./scripts/security/deny.sh
+
+      - name: Run integration tests
+        run: ./scripts/test/integration.sh

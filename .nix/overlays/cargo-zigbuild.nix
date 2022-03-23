@@ -10,11 +10,11 @@ buildRustPackage rec {
   meta = with lib; {
     description = "Compile Cargo project with zig as linker.";
     homepage = "https://github.com/messense/cargo-zigbuild";
-    license = licenses.mit;
+    license = with licenses; [ mit ];
   };
 
   pname = "cargo-zigbuild";
-  version = "0.6.6";
+  version = "0.6.7";
 
   cargoBuildFlags = [
     "--bin"
@@ -25,9 +25,9 @@ buildRustPackage rec {
     owner = "messense";
     repo = "cargo-zigbuild";
     rev = "v${version}";
-    sha256 = "sha256-YnRIH0IDMg7SOrY6EkFlKluEslzLyIwN5PSoLn/BjY8=";
+    sha256 = "sha256-oqfKlc/J1KjVPzaCsRo/WQQv9L4qUXSFIzTo4YuGUT0=";
   };
 
-  cargoSha256 = "sha256-n8DZrSHhHUibMORFIfCZdTi971hbWHvoxnoxIXL0Y5c=";
+  cargoSha256 = "sha256-r9VHjWoD3+6i/jxfsX5G/OCMrnge/X3KIA7G7Yr39U8=";
   doCheck = false;
 }

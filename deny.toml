@@ -21,8 +21,12 @@ ignore = [
 ]
 
 [bans]
-multiple-versions = "warn"
+multiple-versions = "allow"
 wildcards = "warn"
+
+# `rustls` should be used instead.
+[[bans.deny]]
+name = "openssl"
 
 [sources]
 unknown-registry = "deny"

@@ -16,18 +16,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    naersk = {
-      url = "github:nmattia/naersk";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     zig = {
       url = "github:roarkanize/zig-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, fenix, naersk, zig }:
+  outputs = { self, nixpkgs, flake-utils, fenix, zig }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         localOverlay = import .nix/overlay.nix;
@@ -44,8 +39,8 @@
 
         toolchain = {
           channel = "nightly";
-          date = "2022-03-10";
-          sha256 = "sha256-wZFBurC0BwL1RbbzZhlLaVTHcKRfHZItTENDm1HlXJ8=";
+          date = "2022-03-22";
+          sha256 = "sha256-Q8iAiBOIPFs6F2R1Hmtjv0zO5IATPpP1qimTxPxpnWg=";
         };
 
         rust-toolchain = with fenix.packages.${system}; combine (with toolchainOf toolchain; [
@@ -59,12 +54,7 @@
           (targets.aarch64-unknown-linux-gnu.toolchainOf toolchain).rust-std
         ]);
 
-        naersk-lib = naersk.lib.${system}.override {
-          cargo = rust-toolchain;
-          rustc = rust-toolchain;
-        };
-
-        zig-master = zig.packages.${system}."0.9.1";
+        zig-toolchain = zig.packages.${system}."0.9.1";
 
         sqlx-cli = pkgs.sqlx-cli.overrideAttrs (old: rec {
           name = "sqlx-cli-${version}";
@@ -85,13 +75,20 @@
         devShell = mkShell {
           name = "throwaway-shell";
 
-          buildInputs = with pkgs; [ pkgconfig openssl ]
+          buildInputs = with pkgs; [ pkgconfig ]
           ++ lib.optional stdenv.isDarwin [
             libiconv
             SystemConfiguration
+          ]
+          ++ lib.optional stdenv.isLinux [
+            gcc
+            glibc
           ];
 
           nativeBuildInputs = with pkgs; [
+            # Build Dependency
+            pkg-config
+
             # Rust
             rust-toolchain
 
@@ -117,12 +114,11 @@
             postgresql
 
             # Zig
-            zig-master
+            zig-toolchain
 
             # Nix
             nixpkgs-fmt
-          ]
-          ++ lib.optional stdenv.isLinux [
+          ] ++ lib.optional (stdenv.isLinux && stdenv.isx86_64) [
             # Rust Crates
             cargo-tarpaulin
           ];

@@ -24,4 +24,4 @@ RUN : \
   && rm -rf src \
   && :
 
-ENTRYPOINT ["nix", "develop", "--verbose", "--command", "bash"]
+ENTRYPOINT ["nix", "develop", "--verbose", "--command"]

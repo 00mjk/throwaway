@@ -27,7 +27,7 @@ pub enum ProfileError {
 impl IntoResponse for ProfileError {
     fn into_response(self) -> Response {
         let status = match self {
-            ProfileError::NotFound => (StatusCode::NOT_FOUND),
+            Self::NotFound => (StatusCode::NOT_FOUND),
             _ => (StatusCode::BAD_REQUEST),
         };
 

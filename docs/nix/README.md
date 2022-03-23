@@ -26,6 +26,7 @@ direnv allow .
 ```
 
 ## Clean Store
+`error: getting status of '/nix/store/...': No such file or directory`
 
 ```
 nix-store --gc

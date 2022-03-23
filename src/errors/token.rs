@@ -15,7 +15,7 @@ pub enum TokenError {
 impl IntoResponse for TokenError {
     fn into_response(self) -> Response {
         let status = match self {
-            TokenError::InvalidToken => (StatusCode::NOT_FOUND),
+            Self::InvalidToken => (StatusCode::NOT_FOUND),
         };
 
         let body = Json(json!({
