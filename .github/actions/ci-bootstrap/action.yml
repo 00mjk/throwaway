@@ -3,6 +3,10 @@ name: CI Bootstrap
 description: Shared CI bootstrapping tasks
 
 inputs:
+  cacheID:
+    description: Cache ID
+    required: true
+
   cachixToken:
     description: Cachix Token
     required: true
@@ -36,4 +40,15 @@ runs:
       run: echo 'Nix shell built.'
 
     - name: Cache Cargo
-      uses: Swatinem/rust-cache@v1
+      uses: actions/cache@v3
+      with:
+        key: throwaway-${{ inputs.cacheID }}-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        path: |
+          ~/.cargo/bin
+          ~/.cargo/registry/index
+          ~/.cargo/registry/cache
+          ~/.cargo/git
+          ~/.cargo/.crates.toml
+          ~/.cargo/.crates2.json
+          ./target
+

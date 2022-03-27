@@ -25,6 +25,7 @@ jobs:
       - name: Bootstrap CI
         uses: ./.github/actions/ci-bootstrap
         with:
+          cacheID: build
           cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Build package
@@ -42,6 +43,7 @@ jobs:
       - name: Bootstrap CI
         uses: ./.github/actions/ci-bootstrap
         with:
+          cacheID: lint
           cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Run formatter
@@ -62,6 +64,7 @@ jobs:
       - name: Bootstrap CI
         uses: ./.github/actions/ci-bootstrap
         with:
+          cacheID: unit
           cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Run unit tests
@@ -79,6 +82,7 @@ jobs:
       - name: Bootstrap CI
         uses: ./.github/actions/ci-bootstrap
         with:
+          cacheID: integration
           cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Create cluster

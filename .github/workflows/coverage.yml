@@ -21,6 +21,7 @@ jobs:
       - name: Bootstrap CI
         uses: ./.github/actions/ci-bootstrap
         with:
+          cacheID: coverage
           cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Create cluster

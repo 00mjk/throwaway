@@ -28,6 +28,7 @@ jobs:
       - name: Bootstrap CI
         uses: ./.github/actions/ci-bootstrap
         with:
+          cacheID: audit
           cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Run audit
@@ -45,6 +46,7 @@ jobs:
       - name: Bootstrap CI
         uses: ./.github/actions/ci-bootstrap
         with:
+          cacheID: deny
           cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Run deny
