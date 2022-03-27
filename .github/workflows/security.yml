@@ -11,6 +11,10 @@ on:
     # At 12:00 on Wednesday
     - cron: '0 12 * * 3'
 
+defaults:
+  run:
+    shell: nix develop --ignore-environment --command bash {0}
+
 jobs:
   audit:
     name: Audit
@@ -27,7 +31,7 @@ jobs:
           cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Run audit
-        run: nix develop --command ./scripts/security/audit.sh
+        run: ./scripts/security/audit.sh
 
   deny:
     name: Deny
@@ -44,4 +48,4 @@ jobs:
           cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Run deny
-        run: nix develop --command ./scripts/security/deny.sh
+        run: ./scripts/security/deny.sh

@@ -8,6 +8,10 @@ on:
     branches:
       - master
 
+defaults:
+  run:
+    shell: nix develop --ignore-environment --command bash {0}
+
 jobs:
   build:
     name: Build
@@ -24,7 +28,7 @@ jobs:
           cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Build package
-        run: nix develop --command ./scripts/compile.sh
+        run: ./scripts/compile.sh
 
   lint:
     name: Lint
@@ -41,10 +45,10 @@ jobs:
           cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Run formatter
-        run: nix develop --command ./scripts/fmt-ci.sh
+        run: ./scripts/fmt-ci.sh
 
       - name: Run linters
-        run: nix develop --command ./scripts/lint.sh
+        run: ./scripts/lint.sh
 
   unit:
     name: Unit Tests
@@ -61,7 +65,7 @@ jobs:
           cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Run unit tests
-        run: nix develop --command ./scripts/test/unit.sh
+        run: ./scripts/test/unit.sh
 
   integration:
     name: Integration Tests
@@ -78,10 +82,10 @@ jobs:
           cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Create cluster
-        run: nix develop --command ./scripts/cluster/up.sh
+        run: ./scripts/cluster/up.sh
 
       - name: Provision DB
-        run: nix develop --command ./scripts/sql/migrate.sh
+        run: ./scripts/sql/migrate.sh
 
       - name: Run integration tests
-        run: nix develop --command ./scripts/test/integration.sh
+        run: ./scripts/test/integration.sh

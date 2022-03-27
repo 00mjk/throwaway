@@ -25,9 +25,8 @@
   outputs = { self, nixpkgs, flake-utils, fenix, zig }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        localOverlay = import .nix/overlay.nix;
         overlays = [
-          localOverlay
+          (import .nix/overlay.nix)
         ];
 
         pkgs = import nixpkgs {
@@ -90,6 +89,9 @@
 
             # Nix
             nixpkgs-fmt
+
+            # Utilities
+            curl
           ] ++ lib.optional (stdenv.isLinux && stdenv.isx86_64) [
             # Rust Crates
             cargo-tarpaulin

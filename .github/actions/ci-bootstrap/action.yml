@@ -16,6 +16,8 @@ runs:
         install_url: https://releases.nixos.org/nix/nix-2.7.0/install
         nix_path: nixpkgs=channel:nixos-unstable
         extra_nix_config: |
+          sandbox = true
+          sandbox-fallback = false
           experimental-features = nix-command flakes
 
     - name: Cache Nix
@@ -25,9 +27,13 @@ runs:
         authToken: "${{ inputs.cachixToken }}"
         extraPullNames: nix-community
 
-    - name: Build Nix shell
+    - name: Remove non Nix binaries
       shell: bash
-      run: nix develop --command echo 'Nix shell built.'
+      run: rm -rf ~/.cargo/bin
+
+    - name: Build Nix shell
+      shell: nix develop --ignore-environment --command bash {0}
+      run: echo 'Nix shell built.'
 
     - name: Cache Cargo
       uses: Swatinem/rust-cache@v1

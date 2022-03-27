@@ -13,6 +13,9 @@ target
 # Nix
 result
 
+# Kubernetes
+.kube
+
 # Dir Env
 .direnv
 
