@@ -34,25 +34,10 @@
           inherit system overlays;
         };
 
-        inherit (pkgs) mkShell stdenv lib fetchFromGitHub;
-        inherit (pkgs.darwin.apple_sdk.frameworks) SystemConfiguration;
-
-        toolchain = {
-          channel = "nightly";
-          date = "2022-03-22";
-          sha256 = "sha256-Q8iAiBOIPFs6F2R1Hmtjv0zO5IATPpP1qimTxPxpnWg=";
+        rust-toolchain = fenix.packages."${system}".fromToolchainFile {
+          file = "${self}/rust-toolchain.toml";
+          sha256 = "sha256-qYjPB1399EkSf+a8LpzelPusG5GZjAhAmuaJ4wDqMkU=";
         };
-
-        rust-toolchain = with fenix.packages.${system}; combine (with toolchainOf toolchain; [
-          cargo
-          clippy
-          rustc
-          rustfmt
-          rust-src
-          rust-std
-          (targets.aarch64-apple-darwin.toolchainOf toolchain).rust-std
-          (targets.aarch64-unknown-linux-gnu.toolchainOf toolchain).rust-std
-        ]);
 
         zig-toolchain = zig.packages.${system}."0.9.1";
 
@@ -60,7 +45,7 @@
           name = "sqlx-cli-${version}";
           version = "0.5.11";
 
-          src = fetchFromGitHub {
+          src = pkgs.fetchFromGitHub {
             owner = "launchbadge";
             repo = "sqlx";
             rev = "v${version}";
@@ -72,23 +57,10 @@
       in
       rec {
         # `nix develop`
-        devShell = mkShell {
+        devShell = pkgs.mkShell {
           name = "throwaway-shell";
 
-          buildInputs = with pkgs; [ pkgconfig ]
-          ++ lib.optional stdenv.isDarwin [
-            libiconv
-            SystemConfiguration
-          ]
-          ++ lib.optional stdenv.isLinux [
-            gcc
-            glibc
-          ];
-
-          nativeBuildInputs = with pkgs; [
-            # Build Dependency
-            pkg-config
-
+          buildInputs = with pkgs; [
             # Rust
             rust-toolchain
 

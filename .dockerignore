@@ -1,20 +1,5 @@
 # Ignore Everything
 **
 
-# Project
-!.cargo
-!sql
-!src
-!Cargo.lock
-!Cargo.toml
-!Makefile.toml
-!README.md
-!sqlx-data.json
-
-# Nix
-!.nix
-!flake.nix
-!flake.lock
-
 # Dev Builds
 !target/aarch64-unknown-linux-gnu/debug

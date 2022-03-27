@@ -4,10 +4,6 @@ name: Coverage
 on:
   workflow_dispatch:
 
-defaults:
-  run:
-    shell: nix develop --verbose --command bash {0}
-
 jobs:
   coverage:
     name: Coverage
@@ -24,13 +20,13 @@ jobs:
           cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Create cluster
-        run: ./scripts/cluster/up.sh
+        run: nix develop --command ./scripts/cluster/up.sh
 
       - name: Provision DB
-        run: ./scripts/sql/migrate.sh
+        run: nix develop --command ./scripts/sql/migrate.sh
 
       - name: Generate coverage
-        run: ./scripts/coverage.sh
+        run: nix develop --command ./scripts/coverage.sh
 
       - name: Deploy coverage report
         uses: JamesIves/github-pages-deploy-action@v4.2.5
