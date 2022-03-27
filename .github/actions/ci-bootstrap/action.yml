@@ -42,7 +42,7 @@ runs:
     - name: Cache Cargo
       uses: actions/cache@v3
       with:
-        key: throwaway-${{ inputs.cacheID }}-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        key: throwaway-${{ runner.os }}-${{ inputs.cacheID }}-cargo-${{ hashFiles('**/Cargo.lock') }}
         path: |
           ~/.cargo/bin
           ~/.cargo/registry/index
@@ -51,4 +51,6 @@ runs:
           ~/.cargo/.crates.toml
           ~/.cargo/.crates2.json
           ./target
-
+        restore-keys: |
+          throwaway-${{ runner.os }}-${{ inputs.cacheID }}-cargo-
+          throwaway-${{ runner.os }}-
