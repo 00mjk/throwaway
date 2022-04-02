@@ -39,13 +39,21 @@ script = '''
 cargo build
 cargo test
 grcov . \
-  --source-dir src \
+  --source-dir . \
+  --ignore='/**' \
   --binary-path ./target/debug \
-  --output-type html \
+  --output-type lcov \
   --branch \
   --ignore-not-existing \
-  --output-path ./target/debug/coverage
+  --output-path ./target/debug/coverage.info
 rm -rf *.profraw
+genhtml \
+  --output-directory report/ \
+  --show-details \
+  --highlight \
+  --ignore-errors source \
+  --legend \
+  ./target/debug/coverage.info
 '''
 
 [tasks.audit]

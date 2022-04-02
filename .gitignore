@@ -11,6 +11,7 @@ target
 *.rs.bk
 
 # Coverage
+report
 *.profraw
 
 # Nix

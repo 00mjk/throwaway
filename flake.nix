@@ -113,8 +113,11 @@
           cargo-make
           cargo-nextest
           cargo-zigbuild
-          grcov
           sqlx-cli
+
+          # Coverage
+          grcov
+          lcov
 
           # Kubernetes
           kubectl
