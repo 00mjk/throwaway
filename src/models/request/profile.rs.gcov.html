@@ -76,7 +76,7 @@
 <a name="6"><span class="lineNum">       6 </span>            : use crate::validation::name::validate_name;</a>
 <a name="7"><span class="lineNum">       7 </span>            : use crate::validation::timezone::validate_timezone;</a>
 <a name="8"><span class="lineNum">       8 </span>            : </a>
-<a name="9"><span class="lineNum">       9 </span><span class="lineCov">         63 : #[derive(Debug, Deserialize, Validate)]</span></a>
+<a name="9"><span class="lineNum">       9 </span><span class="lineCov">        126 : #[derive(Debug, Deserialize, Validate)]</span></a>
 <a name="10"><span class="lineNum">      10 </span>            : pub struct ProfilePatchRequest {</a>
 <a name="11"><span class="lineNum">      11 </span>            :     #[validate(custom = &quot;validate_name&quot;)]</a>
 <a name="12"><span class="lineNum">      12 </span>            :     pub name: Option&lt;String&gt;,</a>

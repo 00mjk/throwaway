@@ -71,7 +71,7 @@
 <a name="1"><span class="lineNum">       1 </span>            : use rand_core::{OsRng, RngCore};</a>
 <a name="2"><span class="lineNum">       2 </span>            : use serde::{Deserialize, Serialize};</a>
 <a name="3"><span class="lineNum">       3 </span>            : </a>
-<a name="4"><span class="lineNum">       4 </span><span class="lineCov">          3 : #[derive(Serialize, Deserialize)]</span></a>
+<a name="4"><span class="lineNum">       4 </span><span class="lineCov">          6 : #[derive(Serialize, Deserialize)]</span></a>
 <a name="5"><span class="lineNum">       5 </span>            : pub struct CreateProfile {</a>
 <a name="6"><span class="lineNum">       6 </span>            :     pub name: String,</a>
 <a name="7"><span class="lineNum">       7 </span>            :     pub email: String,</a>
@@ -81,17 +81,17 @@
 <a name="11"><span class="lineNum">      11 </span>            : }</a>
 <a name="12"><span class="lineNum">      12 </span>            : </a>
 <a name="13"><span class="lineNum">      13 </span>            : impl CreateProfile {</a>
-<a name="14"><span class="lineNum">      14 </span><span class="lineCov">          3 :     pub fn new() -&gt; Self {</span></a>
-<a name="15"><span class="lineNum">      15 </span><span class="lineCov">          3 :         let id = OsRng.next_u64();</span></a>
-<a name="16"><span class="lineNum">      16 </span><span class="lineCov">          3 : </span></a>
-<a name="17"><span class="lineNum">      17 </span><span class="lineCov">          3 :         Self {</span></a>
-<a name="18"><span class="lineNum">      18 </span><span class="lineCov">          3 :             name: format!(&quot;Test {id}&quot;),</span></a>
-<a name="19"><span class="lineNum">      19 </span><span class="lineCov">          3 :             email: format!(&quot;test-{id}@domain.test&quot;),</span></a>
-<a name="20"><span class="lineNum">      20 </span><span class="lineCov">          3 :             password: &quot;test-password&quot;.to_string(),</span></a>
-<a name="21"><span class="lineNum">      21 </span><span class="lineCov">          3 :             country: &quot;UK&quot;.to_string(),</span></a>
-<a name="22"><span class="lineNum">      22 </span><span class="lineCov">          3 :             timezone: &quot;GMT&quot;.to_string(),</span></a>
-<a name="23"><span class="lineNum">      23 </span><span class="lineCov">          3 :         }</span></a>
-<a name="24"><span class="lineNum">      24 </span><span class="lineCov">          3 :     }</span></a>
+<a name="14"><span class="lineNum">      14 </span><span class="lineCov">          6 :     pub fn new() -&gt; Self {</span></a>
+<a name="15"><span class="lineNum">      15 </span><span class="lineCov">          6 :         let id = OsRng.next_u64();</span></a>
+<a name="16"><span class="lineNum">      16 </span><span class="lineCov">          6 : </span></a>
+<a name="17"><span class="lineNum">      17 </span><span class="lineCov">          6 :         Self {</span></a>
+<a name="18"><span class="lineNum">      18 </span><span class="lineCov">          6 :             name: format!(&quot;Test {id}&quot;),</span></a>
+<a name="19"><span class="lineNum">      19 </span><span class="lineCov">          6 :             email: format!(&quot;test-{id}@domain.test&quot;),</span></a>
+<a name="20"><span class="lineNum">      20 </span><span class="lineCov">          6 :             password: &quot;test-password&quot;.to_string(),</span></a>
+<a name="21"><span class="lineNum">      21 </span><span class="lineCov">          6 :             country: &quot;UK&quot;.to_string(),</span></a>
+<a name="22"><span class="lineNum">      22 </span><span class="lineCov">          6 :             timezone: &quot;GMT&quot;.to_string(),</span></a>
+<a name="23"><span class="lineNum">      23 </span><span class="lineCov">          6 :         }</span></a>
+<a name="24"><span class="lineNum">      24 </span><span class="lineCov">          6 :     }</span></a>
 <a name="25"><span class="lineNum">      25 </span>            : }</a>
 </pre>
       </td>

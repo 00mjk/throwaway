@@ -76,14 +76,14 @@
 <a name="6"><span class="lineNum">       6 </span>            : // Migrations embedded within the binary</a>
 <a name="7"><span class="lineNum">       7 </span>            : static MIGRATOR: Migrator = migrate!(&quot;./sql/migrations&quot;);</a>
 <a name="8"><span class="lineNum">       8 </span>            : </a>
-<a name="9"><span class="lineNum">       9 </span><span class="lineCov">         35 : pub async fn migrate(database_deployment: &amp;DatabasePool) -&gt; Result&lt;(), ServerError&gt; {</span></a>
-<a name="10"><span class="lineNum">      10 </span><span class="lineCov">          5 :     MIGRATOR</span></a>
-<a name="11"><span class="lineNum">      11 </span><span class="lineCov">         99 :         .run(database_deployment)</span></a>
-<a name="12"><span class="lineNum">      12 </span><span class="lineCov">         99 :         .await</span></a>
-<a name="13"><span class="lineNum">      13 </span><span class="lineCov">          5 :         .map_err(ServerError::SqlxMigrationError)?;</span></a>
+<a name="9"><span class="lineNum">       9 </span><span class="lineCov">         70 : pub async fn migrate(database_deployment: &amp;DatabasePool) -&gt; Result&lt;(), ServerError&gt; {</span></a>
+<a name="10"><span class="lineNum">      10 </span><span class="lineCov">         10 :     MIGRATOR</span></a>
+<a name="11"><span class="lineNum">      11 </span><span class="lineCov">        198 :         .run(database_deployment)</span></a>
+<a name="12"><span class="lineNum">      12 </span><span class="lineCov">        198 :         .await</span></a>
+<a name="13"><span class="lineNum">      13 </span><span class="lineCov">         10 :         .map_err(ServerError::SqlxMigrationError)?;</span></a>
 <a name="14"><span class="lineNum">      14 </span>            : </a>
-<a name="15"><span class="lineNum">      15 </span><span class="lineCov">          5 :     Ok(())</span></a>
-<a name="16"><span class="lineNum">      16 </span><span class="lineCov">          5 : }</span></a>
+<a name="15"><span class="lineNum">      15 </span><span class="lineCov">         10 :     Ok(())</span></a>
+<a name="16"><span class="lineNum">      16 </span><span class="lineCov">         10 : }</span></a>
 </pre>
       </td>
     </tr>
