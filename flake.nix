@@ -36,7 +36,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         inherit (builtins) fromTOML readFile;
-        inherit (pkgs) lib mkShell fetchFromGitHub dockerTools;
+        inherit (pkgs) lib mkShell fetchFromGitHub fetchurl dockerTools;
         inherit (pkgs.darwin.apple_sdk.frameworks) SystemConfiguration;
 
         pkgs = import nixpkgs {
@@ -101,6 +101,72 @@
           };
         };
 
+        kube3d = pkgs.kube3d.overrideAttrs (old: rec {
+          name = "kube3d-${version}";
+          version = "5.4.1";
+          k3sVersion = "1.23.5+k3s1";
+
+          src = fetchFromGitHub {
+            owner = "k3d-io";
+            repo = "k3d";
+            rev = "v${version}";
+            sha256 = "sha256-DVQrD4JMei9yRFzuiVb6AcydEupNSlpgYLfGWWRiaao=";
+          };
+
+          # k3d moved from the 'rancher' organisation to 'k3d-io', so these build flags needed updating.
+          # https://github.com/k3d-io/k3d/blob/v5.4.1/Makefile#L72
+          ldflags = [
+            "-w"
+            "-s"
+            "-X"
+            "github.com/k3d-io/k3d/v5/version.Version=v${version}"
+            "-X"
+            "github.com/k3d-io/k3d/v5/version.K3sVersion=v${k3sVersion}"
+          ];
+
+          installCheckPhase = ''
+            runHook preInstallCheck
+            $out/bin/k3d --help
+            $out/bin/k3d --version
+            $out/bin/k3d --version | grep -e "k3d version v${version}" -e "k3s version v${k3sVersion}"
+            runHook postInstallCheck
+          '';
+        });
+
+        fluxcd = pkgs.fluxcd.overrideAttrs (old: rec {
+          name = "fluxcd-${version}";
+          version = "0.27.4";
+
+          src = fetchFromGitHub {
+            owner = "fluxcd";
+            repo = "flux2";
+            rev = "v${version}";
+            sha256 = "sha256-4JFS3EhdT3XtV1CXxAt3mEbJJoEVabu0PSE/MUYMJRk=";
+          };
+        });
+
+        terraform = pkgs.terraform.overrideAttrs (old: rec {
+          name = "terraform-${version}";
+          version = "1.1.7";
+
+          src = fetchFromGitHub {
+            owner = "hashicorp";
+            repo = "terraform";
+            rev = "v${version}";
+            sha256 = "sha256-E8qY17MSdA7fQW4wGSDiPzbndBP5SZwelAJAWzka/io=";
+          };
+        });
+
+        postgresql = pkgs.postgresql.overrideAttrs (old: rec {
+          name = "postgresql-${version}";
+          version = "14.2";
+
+          src = fetchurl {
+            url = "https://ftp.postgresql.org/pub/source/v${version}/${name}.tar.bz2";
+            sha256 = "sha256-LPeLLkaJEvgQHWldtTQM8xPC6faKYS+3FCdSToyal3o=";
+          };
+        });
+
         buildInputs = with pkgs; [
           # Build
           pkg-config
@@ -121,8 +187,8 @@
 
           # Kubernetes
           kubectl
-          kube3d # FIXME: v5.2.2
-          fluxcd # FIXME: 0.27.0
+          kube3d
+          fluxcd
           tilt
           kubernetes-helm
 
