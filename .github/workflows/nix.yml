@@ -21,7 +21,7 @@ jobs:
       - name: Bootstrap CI
         uses: ./.github/actions/ci-bootstrap
         with:
-          cacheID: build
+          cacheID: throwaway
           cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Build throwaway
@@ -39,7 +39,7 @@ jobs:
 #      - name: Bootstrap CI
 #        uses: ./.github/actions/ci-bootstrap
 #        with:
-#          cacheID: build
+#          cacheID: throwawayZig
 #          cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 #
 #      - name: Build throwawayZig
@@ -57,7 +57,7 @@ jobs:
       - name: Bootstrap CI
         uses: ./.github/actions/ci-bootstrap
         with:
-          cacheID: build
+          cacheID: throwawayNixImage
           cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Build throwawayNixImage
@@ -75,7 +75,7 @@ jobs:
 #      - name: Bootstrap CI
 #        uses: ./.github/actions/ci-bootstrap
 #        with:
-#          cacheID: build
+#          cacheID: throwawayDevImage
 #          cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 #
 #      - name: Build throwawayDevImage
