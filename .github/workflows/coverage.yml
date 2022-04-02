@@ -28,13 +28,13 @@ jobs:
         run: ./scripts/cluster/up.sh
 
       - name: Provision DB
-        run: ./scripts/sql/migrate.sh
+        run: cargo make migrate
 
       - name: Generate coverage
-        run: ./scripts/coverage.sh
+        run: cargo make coverage
 
       - name: Deploy coverage report
         uses: JamesIves/github-pages-deploy-action@v4.2.5
         with:
           branch: coverage-pages
-          folder: build
+          folder: target/debug/coverage

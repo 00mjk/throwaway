@@ -10,8 +10,17 @@
 target
 *.rs.bk
 
+# Coverage
+*.profraw
+
 # Nix
 result
+
+# Nix Builds
+throwaway
+throwaway-zig
+throwaway-nix-image
+throwaway-dev-image
 
 # Kubernetes
 .kube

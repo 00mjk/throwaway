@@ -1,0 +1,82 @@
+[config]
+skip_core_tasks = true
+
+[tasks.run]
+command = "cargo"
+args = ["run"]
+
+[tasks.check]
+command = "cargo"
+args = ["check"]
+
+[tasks.build]
+command = "cargo"
+args = ["build"]
+
+[tasks.fmt]
+command = "cargo"
+args = ["fmt", "--all"]
+
+[tasks.fmt-ci]
+command = "cargo"
+args = ["fmt", "--all", "--check"]
+
+[tasks.lint]
+command = "cargo"
+args = ["clippy", "--all", "--tests"]
+
+[tasks.integration]
+command = "cargo"
+args = ["nextest", "run", "--test", "*"]
+
+[tasks.unit]
+command = "cargo"
+args = ["nextest", "run", "--lib", "--bins"]
+
+[tasks.coverage]
+env = { "RUSTFLAGS" = "-C instrument-coverage", "LLVM_PROFILE_FILE"="%p-%m.profraw" }
+script = '''
+cargo build
+cargo test
+grcov . \
+  --source-dir src \
+  --binary-path ./target/debug \
+  --output-type html \
+  --branch \
+  --ignore-not-existing \
+  --output-path ./target/debug/coverage
+rm -rf *.profraw
+'''
+
+[tasks.audit]
+command = "cargo"
+args = ["audit"]
+
+[tasks.deny]
+command = "cargo"
+args = ["deny", "check"]
+
+[tasks.migrate]
+env = { "DATABASE_URL" = "postgresql://postgres:password@localhost:5432/postgres" }
+cwd = "sql"
+command = "cargo"
+args = ["sqlx", "migrate", "run"]
+
+[tasks.prepare]
+env = { "DATABASE_URL" = "postgresql://postgres:password@localhost:5432/postgres" }
+command = "cargo"
+args = ["sqlx", "prepare", "--", "--lib"]
+
+[tasks.validate]
+dependencies = [
+  "migrate",
+  "prepare",
+  "check",
+  "build",
+  "fmt",
+  "lint",
+  "unit",
+  "integration",
+  "audit",
+  "deny"
+]

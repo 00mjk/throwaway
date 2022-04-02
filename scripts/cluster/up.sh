@@ -63,6 +63,6 @@ done
 
 echo "Provisioning Vault"
 pushd throwaway-terraform/environment/dev
-terraform init -upgrade
+terraform init
 terraform apply -auto-approve
 popd

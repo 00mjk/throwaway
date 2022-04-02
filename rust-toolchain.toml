@@ -1,9 +1,10 @@
+# https://rust-lang.github.io/rustup-components-history
 [toolchain]
-channel = "nightly-2022-02-28"
-components = ["cargo", "rustfmt", "clippy", "rust-src", "rust-std"]
+channel = "nightly-2022-03-31"
+components = ["cargo", "rustfmt", "clippy", "rust-src", "rust-std", "llvm-tools-preview"]
 targets = [
   "aarch64-apple-darwin",
   "x86_64-apple-darwin",
-  "aarch64-unknown-linux-gnu",
-  "x86_64-unknown-linux-gnu",
+  "aarch64-unknown-linux-musl",
+  "x86_64-unknown-linux-musl",
 ]

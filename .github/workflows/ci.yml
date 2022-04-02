@@ -29,7 +29,7 @@ jobs:
           cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Build package
-        run: ./scripts/compile.sh
+        run: cargo make check && cargo make build
 
   lint:
     name: Lint
@@ -47,10 +47,10 @@ jobs:
           cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Run formatter
-        run: ./scripts/fmt-ci.sh
+        run: cargo make fmt-ci
 
       - name: Run linters
-        run: ./scripts/lint.sh
+        run: cargo make lint
 
   unit:
     name: Unit Tests
@@ -68,7 +68,7 @@ jobs:
           cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - name: Run unit tests
-        run: ./scripts/test/unit.sh
+        run: cargo make unit
 
   integration:
     name: Integration Tests
@@ -89,7 +89,7 @@ jobs:
         run: ./scripts/cluster/up.sh
 
       - name: Provision DB
-        run: ./scripts/sql/migrate.sh
+        run: cargo make migrate
 
       - name: Run integration tests
-        run: ./scripts/test/integration.sh
+        run: cargo make integration
