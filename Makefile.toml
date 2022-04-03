@@ -5,10 +5,6 @@ skip_core_tasks = true
 command = "cargo"
 args = ["run"]
 
-[tasks.check]
-command = "cargo"
-args = ["check"]
-
 [tasks.build]
 command = "cargo"
 args = ["build"]
@@ -79,7 +75,6 @@ args = ["sqlx", "prepare", "--", "--lib"]
 dependencies = [
   "migrate",
   "prepare",
-  "check",
   "build",
   "fmt",
   "lint",
