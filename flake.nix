@@ -41,6 +41,14 @@
 
         pkgs = import nixpkgs {
           inherit system;
+
+          overlays = [
+            (import nix/fluxcd.nix)
+            (import nix/kube3d.nix)
+            (import nix/postgresql.nix)
+            (import nix/sqlx-cli.nix)
+            (import nix/terraform.nix)
+          ];
         };
 
         zig-toolchain = zig.packages.${system}."0.9.1";
@@ -55,19 +63,6 @@
         };
 
         cargoToml = fromTOML (readFile ("${self}/Cargo.toml"));
-
-        sqlx-cli = pkgs.sqlx-cli.overrideAttrs (old: rec {
-          name = "sqlx-cli-${version}";
-          version = cargoToml.dependencies.sqlx.version;
-
-          cargoSha256 = "sha256-EKuRaVxwotgTPj95GJnrQGbulsFPClSettwS5f0TzoM=";
-          src = fetchFromGitHub {
-            owner = "launchbadge";
-            repo = "sqlx";
-            rev = "v${version}";
-            sha256 = "sha256-Tz7YzGkQUwH0U14dvsttP2GpnM9kign6L9PkAVs3dEc=";
-          };
-        });
 
         cargo-nextest = naerskPlatform.buildPackage {
           pname = "cargo-nextest";
@@ -88,7 +83,6 @@
             sha256 = "sha256-E3/AgzLvjlMfbmvAOYx4V1/1wSLKlFo61tGv79ow7XY=";
           };
         };
-
         cargo-zigbuild = naerskPlatform.buildPackage {
           name = "cargo-zigbuild";
           version = "0.8.1";
@@ -100,72 +94,6 @@
             sha256 = "sha256-Xd9saaqSc2o8Tl5XSvOb18+t2ru8FGg4LJN3ctVbctI=";
           };
         };
-
-        kube3d = pkgs.kube3d.overrideAttrs (old: rec {
-          name = "kube3d-${version}";
-          version = "5.4.1";
-          k3sVersion = "1.23.5+k3s1";
-
-          src = fetchFromGitHub {
-            owner = "k3d-io";
-            repo = "k3d";
-            rev = "v${version}";
-            sha256 = "sha256-DVQrD4JMei9yRFzuiVb6AcydEupNSlpgYLfGWWRiaao=";
-          };
-
-          # k3d moved from the 'rancher' organisation to 'k3d-io', so these build flags needed updating.
-          # https://github.com/k3d-io/k3d/blob/v5.4.1/Makefile#L72
-          ldflags = [
-            "-w"
-            "-s"
-            "-X"
-            "github.com/k3d-io/k3d/v5/version.Version=v${version}"
-            "-X"
-            "github.com/k3d-io/k3d/v5/version.K3sVersion=v${k3sVersion}"
-          ];
-
-          installCheckPhase = ''
-            runHook preInstallCheck
-            $out/bin/k3d --help
-            $out/bin/k3d --version
-            $out/bin/k3d --version | grep -e "k3d version v${version}" -e "k3s version v${k3sVersion}"
-            runHook postInstallCheck
-          '';
-        });
-
-        fluxcd = pkgs.fluxcd.overrideAttrs (old: rec {
-          name = "fluxcd-${version}";
-          version = "0.27.4";
-
-          src = fetchFromGitHub {
-            owner = "fluxcd";
-            repo = "flux2";
-            rev = "v${version}";
-            sha256 = "sha256-4JFS3EhdT3XtV1CXxAt3mEbJJoEVabu0PSE/MUYMJRk=";
-          };
-        });
-
-        terraform = pkgs.terraform.overrideAttrs (old: rec {
-          name = "terraform-${version}";
-          version = "1.1.7";
-
-          src = fetchFromGitHub {
-            owner = "hashicorp";
-            repo = "terraform";
-            rev = "v${version}";
-            sha256 = "sha256-E8qY17MSdA7fQW4wGSDiPzbndBP5SZwelAJAWzka/io=";
-          };
-        });
-
-        postgresql = pkgs.postgresql.overrideAttrs (old: rec {
-          name = "postgresql-${version}";
-          version = "14.2";
-
-          src = fetchurl {
-            url = "https://ftp.postgresql.org/pub/source/v${version}/${name}.tar.bz2";
-            sha256 = "sha256-LPeLLkaJEvgQHWldtTQM8xPC6faKYS+3FCdSToyal3o=";
-          };
-        });
 
         buildInputs = with pkgs; [
           # Build
