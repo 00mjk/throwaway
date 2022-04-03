@@ -1,3 +1,5 @@
+{ cargoToml }:
+
 self: super:
 
 let
@@ -7,7 +9,7 @@ in
 {
   sqlx-cli = super.sqlx-cli.overrideAttrs (old: rec {
     name = "sqlx-cli-${version}";
-    version = "0.5.11";
+    version = cargoToml.dependencies.sqlx.version;
 
     cargoSha256 = "sha256-EKuRaVxwotgTPj95GJnrQGbulsFPClSettwS5f0TzoM=";
     src = fetchFromGitHub {

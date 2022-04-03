@@ -46,7 +46,7 @@
             (import nix/fluxcd.nix)
             (import nix/kube3d.nix)
             (import nix/postgresql.nix)
-            (import nix/sqlx-cli.nix)
+            (import nix/sqlx-cli.nix { inherit cargoToml; })
             (import nix/terraform.nix)
           ];
         };
@@ -83,6 +83,7 @@
             sha256 = "sha256-E3/AgzLvjlMfbmvAOYx4V1/1wSLKlFo61tGv79ow7XY=";
           };
         };
+
         cargo-zigbuild = naerskPlatform.buildPackage {
           name = "cargo-zigbuild";
           version = "0.8.1";
