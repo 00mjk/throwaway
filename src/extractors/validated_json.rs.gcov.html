@@ -93,11 +93,11 @@
 <a name="23"><span class="lineNum">      23 </span>            : {</a>
 <a name="24"><span class="lineNum">      24 </span>            :     type Rejection = ServerError;</a>
 <a name="25"><span class="lineNum">      25 </span>            : </a>
-<a name="26"><span class="lineNum">      26 </span><span class="lineCov">         98 :     async fn from_request(request_parts: &amp;mut RequestParts&lt;B&gt;) -&gt; Result&lt;Self, Self::Rejection&gt; {</span></a>
-<a name="27"><span class="lineNum">      27 </span><span class="lineCov">         98 :         let Json(object) = Json::&lt;T&gt;::from_request(request_parts).await?;</span></a>
-<a name="28"><span class="lineNum">      28 </span><span class="lineCov">         98 :         object.validate()?;</span></a>
-<a name="29"><span class="lineNum">      29 </span><span class="lineCov">         98 :         Ok(Self(object))</span></a>
-<a name="30"><span class="lineNum">      30 </span><span class="lineCov">        196 :     }</span></a>
+<a name="26"><span class="lineNum">      26 </span><span class="lineCov">         49 :     async fn from_request(request_parts: &amp;mut RequestParts&lt;B&gt;) -&gt; Result&lt;Self, Self::Rejection&gt; {</span></a>
+<a name="27"><span class="lineNum">      27 </span><span class="lineCov">         49 :         let Json(object) = Json::&lt;T&gt;::from_request(request_parts).await?;</span></a>
+<a name="28"><span class="lineNum">      28 </span><span class="lineCov">         49 :         object.validate()?;</span></a>
+<a name="29"><span class="lineNum">      29 </span><span class="lineCov">         49 :         Ok(Self(object))</span></a>
+<a name="30"><span class="lineNum">      30 </span><span class="lineCov">         98 :     }</span></a>
 <a name="31"><span class="lineNum">      31 </span>            : }</a>
 </pre>
       </td>

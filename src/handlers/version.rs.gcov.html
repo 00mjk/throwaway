@@ -78,17 +78,17 @@
 <a name="8"><span class="lineNum">       8 </span>            : use crate::VERSION;</a>
 <a name="9"><span class="lineNum">       9 </span>            : </a>
 <a name="10"><span class="lineNum">      10 </span>            : #[must_use]</a>
-<a name="11"><span class="lineNum">      11 </span><span class="lineCov">         70 : pub fn routes() -&gt; Router {</span></a>
-<a name="12"><span class="lineNum">      12 </span><span class="lineCov">         70 :     Router::new().route(&quot;/version&quot;, get(version_get))</span></a>
-<a name="13"><span class="lineNum">      13 </span><span class="lineCov">         70 : }</span></a>
+<a name="11"><span class="lineNum">      11 </span><span class="lineCov">         35 : pub fn routes() -&gt; Router {</span></a>
+<a name="12"><span class="lineNum">      12 </span><span class="lineCov">         35 :     Router::new().route(&quot;/version&quot;, get(version_get))</span></a>
+<a name="13"><span class="lineNum">      13 </span><span class="lineCov">         35 : }</span></a>
 <a name="14"><span class="lineNum">      14 </span>            : </a>
-<a name="15"><span class="lineNum">      15 </span><span class="lineCov">         14 : pub async fn version_get() -&gt; Result&lt;impl IntoResponse, ServerError&gt; {</span></a>
-<a name="16"><span class="lineNum">      16 </span><span class="lineCov">         14 :     let response = VersionResponse {</span></a>
-<a name="17"><span class="lineNum">      17 </span><span class="lineCov">         14 :         version: VERSION.to_string(),</span></a>
-<a name="18"><span class="lineNum">      18 </span><span class="lineCov">         14 :     };</span></a>
-<a name="19"><span class="lineNum">      19 </span><span class="lineCov">         14 : </span></a>
-<a name="20"><span class="lineNum">      20 </span><span class="lineCov">         14 :     Ok((StatusCode::OK, Json(response)))</span></a>
-<a name="21"><span class="lineNum">      21 </span><span class="lineCov">         14 : }</span></a>
+<a name="15"><span class="lineNum">      15 </span><span class="lineCov">          7 : pub async fn version_get() -&gt; Result&lt;impl IntoResponse, ServerError&gt; {</span></a>
+<a name="16"><span class="lineNum">      16 </span><span class="lineCov">          7 :     let response = VersionResponse {</span></a>
+<a name="17"><span class="lineNum">      17 </span><span class="lineCov">          7 :         version: VERSION.to_string(),</span></a>
+<a name="18"><span class="lineNum">      18 </span><span class="lineCov">          7 :     };</span></a>
+<a name="19"><span class="lineNum">      19 </span><span class="lineCov">          7 : </span></a>
+<a name="20"><span class="lineNum">      20 </span><span class="lineCov">          7 :     Ok((StatusCode::OK, Json(response)))</span></a>
+<a name="21"><span class="lineNum">      21 </span><span class="lineCov">          7 : }</span></a>
 </pre>
       </td>
     </tr>

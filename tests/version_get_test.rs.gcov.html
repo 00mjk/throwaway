@@ -68,7 +68,7 @@
       <td>
 <pre class="sourceHeading">          Line data    Source code</pre>
 <pre class="source">
-<a name="1"><span class="lineNum">       1 </span><span class="lineCov">          2 : use anyhow::Error;</span></a>
+<a name="1"><span class="lineNum">       1 </span><span class="lineCov">          1 : use anyhow::Error;</span></a>
 <a name="2"><span class="lineNum">       2 </span>            : mod common;</a>
 <a name="3"><span class="lineNum">       3 </span>            : </a>
 <a name="4"><span class="lineNum">       4 </span>            : use common::models::profile::profile_create::CreateProfile;</a>
@@ -76,20 +76,20 @@
 <a name="6"><span class="lineNum">       6 </span>            : </a>
 <a name="7"><span class="lineNum">       7 </span>            : use crate::common::framework::Framework;</a>
 <a name="8"><span class="lineNum">       8 </span>            : </a>
-<a name="9"><span class="lineNum">       9 </span><span class="lineCov">          2 : #[tokio::test]</span></a>
-<a name="10"><span class="lineNum">      10 </span><span class="lineCov">          2 : async fn version_get_valid() -&gt; Result&lt;(), Error&gt; {</span></a>
-<a name="11"><span class="lineNum">      11 </span><span class="lineCov">         74 :     let framework = Framework::new().await;</span></a>
+<a name="9"><span class="lineNum">       9 </span><span class="lineCov">          1 : #[tokio::test]</span></a>
+<a name="10"><span class="lineNum">      10 </span><span class="lineCov">          1 : async fn version_get_valid() -&gt; Result&lt;(), Error&gt; {</span></a>
+<a name="11"><span class="lineNum">      11 </span><span class="lineCov">         36 :     let framework = Framework::new().await;</span></a>
 <a name="12"><span class="lineNum">      12 </span>            : </a>
 <a name="13"><span class="lineNum">      13 </span>            :     // Lookup version</a>
-<a name="14"><span class="lineNum">      14 </span><span class="lineCov">          6 :     let version_response = framework.get_version().await?;</span></a>
+<a name="14"><span class="lineNum">      14 </span><span class="lineCov">          3 :     let version_response = framework.get_version().await?;</span></a>
 <a name="15"><span class="lineNum">      15 </span>            : </a>
-<a name="16"><span class="lineNum">      16 </span><span class="lineCov">          2 :     let version_string = version_response.body[&quot;version&quot;]</span></a>
-<a name="17"><span class="lineNum">      17 </span><span class="lineCov">          2 :         .as_str()</span></a>
-<a name="18"><span class="lineNum">      18 </span><span class="lineCov">          2 :         .unwrap();</span></a>
-<a name="19"><span class="lineNum">      19 </span><span class="lineCov">          2 :     assert!(!version_string.is_empty());</span></a>
+<a name="16"><span class="lineNum">      16 </span><span class="lineCov">          1 :     let version_string = version_response.body[&quot;version&quot;]</span></a>
+<a name="17"><span class="lineNum">      17 </span><span class="lineCov">          1 :         .as_str()</span></a>
+<a name="18"><span class="lineNum">      18 </span><span class="lineCov">          1 :         .unwrap();</span></a>
+<a name="19"><span class="lineNum">      19 </span><span class="lineCov">          1 :     assert!(!version_string.is_empty());</span></a>
 <a name="20"><span class="lineNum">      20 </span>            : </a>
-<a name="21"><span class="lineNum">      21 </span><span class="lineCov">          2 :     Ok(())</span></a>
-<a name="22"><span class="lineNum">      22 </span><span class="lineCov">          2 : }</span></a>
+<a name="21"><span class="lineNum">      21 </span><span class="lineCov">          1 :     Ok(())</span></a>
+<a name="22"><span class="lineNum">      22 </span><span class="lineCov">          1 : }</span></a>
 </pre>
       </td>
     </tr>

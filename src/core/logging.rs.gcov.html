@@ -79,23 +79,23 @@
 <a name="9"><span class="lineNum">       9 </span>            : </a>
 <a name="10"><span class="lineNum">      10 </span>            : #[allow(clippy::cognitive_complexity)]</a>
 <a name="11"><span class="lineNum">      11 </span>            : pub fn init() -&gt; Result&lt;(), ServerError&gt; {</a>
-<a name="12"><span class="lineNum">      12 </span><span class="lineCov">         70 :     LogTracer::init().map_err(ServerError::LogTracerError)?;</span></a>
+<a name="12"><span class="lineNum">      12 </span><span class="lineCov">         35 :     LogTracer::init().map_err(ServerError::LogTracerError)?;</span></a>
 <a name="13"><span class="lineNum">      13 </span>            : </a>
-<a name="14"><span class="lineNum">      14 </span><span class="lineCov">         70 :     let env_filter = EnvFilter::try_from_default_env()</span></a>
-<a name="15"><span class="lineNum">      15 </span><span class="lineCov">         70 :         .or_else(|_| EnvFilter::try_new(&quot;debug&quot;))</span></a>
-<a name="16"><span class="lineNum">      16 </span><span class="lineCov">         70 :         .map_err(|err| ServerError::LogEnvError(FromEnvError::from(err)))?;</span></a>
+<a name="14"><span class="lineNum">      14 </span><span class="lineCov">         35 :     let env_filter = EnvFilter::try_from_default_env()</span></a>
+<a name="15"><span class="lineNum">      15 </span><span class="lineCov">         35 :         .or_else(|_| EnvFilter::try_new(&quot;debug&quot;))</span></a>
+<a name="16"><span class="lineNum">      16 </span><span class="lineCov">         35 :         .map_err(|err| ServerError::LogEnvError(FromEnvError::from(err)))?;</span></a>
 <a name="17"><span class="lineNum">      17 </span>            : </a>
-<a name="18"><span class="lineNum">      18 </span><span class="lineCov">         70 :     let stdout_subscriber = tracing_subscriber::fmt::layer();</span></a>
-<a name="19"><span class="lineNum">      19 </span><span class="lineCov">         70 : </span></a>
-<a name="20"><span class="lineNum">      20 </span><span class="lineCov">         70 :     let subscriber = Registry::default()</span></a>
-<a name="21"><span class="lineNum">      21 </span><span class="lineCov">         70 :         .with(env_filter)</span></a>
-<a name="22"><span class="lineNum">      22 </span><span class="lineCov">         70 :         .with(ErrorLayer::default())</span></a>
-<a name="23"><span class="lineNum">      23 </span><span class="lineCov">         70 :         .with(stdout_subscriber);</span></a>
-<a name="24"><span class="lineNum">      24 </span><span class="lineCov">         70 : </span></a>
-<a name="25"><span class="lineNum">      25 </span><span class="lineCov">         70 :     set_global_default(subscriber).map_err(ServerError::LogSubscriberError)?;</span></a>
+<a name="18"><span class="lineNum">      18 </span><span class="lineCov">         35 :     let stdout_subscriber = tracing_subscriber::fmt::layer();</span></a>
+<a name="19"><span class="lineNum">      19 </span><span class="lineCov">         35 : </span></a>
+<a name="20"><span class="lineNum">      20 </span><span class="lineCov">         35 :     let subscriber = Registry::default()</span></a>
+<a name="21"><span class="lineNum">      21 </span><span class="lineCov">         35 :         .with(env_filter)</span></a>
+<a name="22"><span class="lineNum">      22 </span><span class="lineCov">         35 :         .with(ErrorLayer::default())</span></a>
+<a name="23"><span class="lineNum">      23 </span><span class="lineCov">         35 :         .with(stdout_subscriber);</span></a>
+<a name="24"><span class="lineNum">      24 </span><span class="lineCov">         35 : </span></a>
+<a name="25"><span class="lineNum">      25 </span><span class="lineCov">         35 :     set_global_default(subscriber).map_err(ServerError::LogSubscriberError)?;</span></a>
 <a name="26"><span class="lineNum">      26 </span>            : </a>
-<a name="27"><span class="lineNum">      27 </span><span class="lineCov">         70 :     Ok(())</span></a>
-<a name="28"><span class="lineNum">      28 </span><span class="lineCov">         70 : }</span></a>
+<a name="27"><span class="lineNum">      27 </span><span class="lineCov">         35 :     Ok(())</span></a>
+<a name="28"><span class="lineNum">      28 </span><span class="lineCov">         35 : }</span></a>
 </pre>
       </td>
     </tr>
