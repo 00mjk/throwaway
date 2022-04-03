@@ -108,6 +108,10 @@
           # Utilities
           curl
           jq
+          bat
+          ripgrep
+          fd
+          exa
         ] ++ lib.optional (stdenv.isDarwin) [
           # Build
           SystemConfiguration
