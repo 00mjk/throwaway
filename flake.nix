@@ -46,10 +46,16 @@
             (import nix/fluxcd.nix)
             (import nix/kube3d.nix)
             (import nix/postgresql.nix)
-            (import nix/sqlx-cli.nix { inherit cargoToml; })
             (import nix/terraform.nix)
+
+            (import nix/sqlx-cli.nix { inherit cargoToml; })
+
+            (import nix/cargo-nextest.nix { inherit naerskPlatform; })
+            (import nix/cargo-zigbuild.nix { inherit naerskPlatform; })
           ];
         };
+
+        cargoToml = fromTOML (readFile ("${self}/Cargo.toml"));
 
         zig-toolchain = zig.packages.${system}."0.9.1";
         rust-toolchain = fenix.packages."${system}".fromToolchainFile {
@@ -60,40 +66,6 @@
         naerskPlatform = naersk.lib.${system}.override {
           cargo = rust-toolchain;
           rustc = rust-toolchain;
-        };
-
-        cargoToml = fromTOML (readFile ("${self}/Cargo.toml"));
-
-        cargo-nextest = naerskPlatform.buildPackage {
-          pname = "cargo-nextest";
-          version = "0.9.12";
-
-          cargoBuildFlags = [
-            "--manifest-path"
-            "cargo-nextest/Cargo.toml"
-            "--bin"
-            "cargo-nextest"
-          ];
-
-          cargoSha256 = "sha256-zrYmZG3VAneanHaNoG3txv7LbKCYvqIf60g1W7CmPG8=";
-          src = fetchFromGitHub {
-            owner = "nextest-rs";
-            repo = "nextest";
-            rev = "cargo-nextest-0.9.12";
-            sha256 = "sha256-E3/AgzLvjlMfbmvAOYx4V1/1wSLKlFo61tGv79ow7XY=";
-          };
-        };
-
-        cargo-zigbuild = naerskPlatform.buildPackage {
-          name = "cargo-zigbuild";
-          version = "0.8.1";
-
-          src = fetchFromGitHub {
-            owner = "messense";
-            repo = "cargo-zigbuild";
-            rev = "v0.8.1";
-            sha256 = "sha256-Xd9saaqSc2o8Tl5XSvOb18+t2ru8FGg4LJN3ctVbctI=";
-          };
         };
 
         buildInputs = with pkgs; [
