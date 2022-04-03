@@ -20,7 +20,6 @@ result
 # Nix Builds
 throwaway
 throwaway-zig
-throwaway-nix-image
 throwaway-dev-image
 
 # Kubernetes

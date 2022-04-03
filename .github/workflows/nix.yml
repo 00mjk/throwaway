@@ -44,25 +44,7 @@ jobs:
 #
 #      - name: Build throwawayZig
 #        run: nix build --print-build-logs .#throwawayZig
-
-  throwawayNixImage:
-    name: throwawayNixImage
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          submodules: true
-
-      - name: Bootstrap CI
-        uses: ./.github/actions/ci-bootstrap
-        with:
-          cacheID: throwawayNixImage
-          cachixToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
-
-      - name: Build throwawayNixImage
-        run: nix build --print-build-logs .#throwawayNixImage
-
+#
 #  throwawayDevImage:
 #    name: throwawayDevImage
 #    runs-on: ubuntu-latest

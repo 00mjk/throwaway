@@ -36,22 +36,22 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         inherit (builtins) fromTOML readFile;
-        inherit (pkgs) lib mkShell fetchFromGitHub fetchurl dockerTools;
+        inherit (pkgs) lib mkShell callPackage fetchFromGitHub fetchurl dockerTools;
         inherit (pkgs.darwin.apple_sdk.frameworks) SystemConfiguration;
 
         pkgs = import nixpkgs {
           inherit system;
 
           overlays = [
-            (import nix/fluxcd.nix)
-            (import nix/kube3d.nix)
-            (import nix/postgresql.nix)
-            (import nix/terraform.nix)
+            (import nix/overlays/fluxcd.nix)
+            (import nix/overlays/kube3d.nix)
+            (import nix/overlays/postgresql.nix)
+            (import nix/overlays/terraform.nix)
 
-            (import nix/sqlx-cli.nix { inherit cargoToml; })
+            (import nix/overlays/sqlx-cli.nix { inherit cargoToml; })
 
-            (import nix/cargo-nextest.nix { inherit naerskPlatform; })
-            (import nix/cargo-zigbuild.nix { inherit naerskPlatform; })
+            (import nix/overlays/cargo-nextest.nix { inherit naerskPlatform; })
+            (import nix/overlays/cargo-zigbuild.nix { inherit naerskPlatform; })
           ];
         };
 
@@ -116,93 +116,18 @@
       rec {
         packages = {
           # nix build .#throwaway
-          throwaway = naerskPlatform.buildPackage {
-            inherit buildInputs;
-
-            name = "throwaway";
-            pname = "throwaway";
-            version = cargoToml.package.version;
-
-            src = nix-filter.lib {
-              root = self;
-              include = [
-                (nix-filter.lib.inDirectory "sql")
-                (nix-filter.lib.inDirectory "src")
-                "Cargo.lock"
-                "Cargo.toml"
-                "sqlx-data.json"
-              ];
-            };
-
-            release = false;
-            doCheck = false;
+          throwaway = callPackage nix/packages/throwaway.nix {
+            inherit self pkgs nix-filter cargoToml naerskPlatform buildInputs;
           };
 
           # nix build .#throwawayZig
-          throwawayZig = naerskPlatform.buildPackage {
-            inherit buildInputs;
-
-            name = "throwaway";
-            pname = "throwaway-zig";
-            version = cargoToml.package.version;
-
-            src = nix-filter.lib {
-              root = self;
-              include = [
-                (nix-filter.lib.inDirectory "sql")
-                (nix-filter.lib.inDirectory "src")
-                "Cargo.lock"
-                "Cargo.toml"
-                "sqlx-data.json"
-              ];
-            };
-
-            override = _: {
-              preBuild = ''
-                # exporting HOME to avoid using `/homeless-shelter/Library/Caches`
-                # (read only filesystem on MacOS)
-                export HOME=$TMP
-              '';
-            };
-
-            release = false;
-            doCheck = false;
-
-            cargoBuild = x: ''cargo $cargo_options zigbuild $cargo_build_options >> $cargo_build_output_json'';
-            cargoBuildOptions = x: x ++ [ "--target" "aarch64-unknown-linux-musl" ];
-          };
-
-          # nix build .#throwawayNixImage
-          throwawayNixImage = dockerTools.buildLayeredImageWithNixDb {
-            name = "throwaway-nix";
-            tag = cargoToml.package.version;
-
-            contents = buildInputs;
-
-            config = {
-              Entrypoint = [ "nix" "develop" "--verbose" "--command" ];
-            };
+          throwawayZig = callPackage nix/packages/throwaway-zig.nix {
+            inherit self pkgs nix-filter cargoToml naerskPlatform buildInputs;
           };
 
           # nix build .#throwawayDevImage
-          throwawayDevImage = dockerTools.buildLayeredImage {
-            name = "throwaway-dev";
-            tag = "latest";
-
-            contents = with packages; [
-              throwawayZig
-            ];
-
-            extraCommands = ''
-              # setup /tmp
-              mkdir -p tmp
-              chmod u+w tmp
-            '';
-
-            config = {
-              User = "1000:1000";
-              Cmd = [ "${packages.throwawayZig}/bin/throwaway" ];
-            };
+          throwawayDevImage = callPackage nix/packages/throwaway-dev-image.nix {
+            inherit pkgs packages cargoToml buildInputs;
           };
         };
 
